@@ -15,5 +15,10 @@ const router = new VueRouter({
 
 new Vue({
   router,
-  template: App.template
+  template: App.template,
+  mounted: function () {
+    this.$nextTick(function () {
+      console.log('check user')
+    })
+  }
 }).$mount('#app')
