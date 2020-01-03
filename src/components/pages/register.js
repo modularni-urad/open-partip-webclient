@@ -1,4 +1,4 @@
-/* global Vue, VueFormGenerator */
+/* global Vue, VueFormGenerator, axios */
 
 VueFormGenerator.validators.resources.fieldIsRequired = 'Toto je povinné'
 VueFormGenerator.validators.resources.textTooSmall =
@@ -64,7 +64,8 @@ export default {
             label: 'Ověřovací kod (v SMS)',
             model: 'validcode',
             required: true,
-            validator: 'string'
+            pattern: /\d+/,
+            validator: 'regexp'
           }
         ]
       },
@@ -79,39 +80,32 @@ export default {
     onValidated: function (isValid, errors) {
       this.$data.formValid = isValid
     },
-    register: async function (record) {
-      const res = await fetch('http://localhost:3001/local/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(record),
-        credentials: 'include'
-      })
-      const body = await res.json()
-      if (body.status === 'error') {
-        alert(body.message)
+    register: async function () {
+      try {
+        let res = await axios.post('http://localhost:3001/local/register', this.$data.model)
+        if (res.status === 200) {
+          res = await axios.post('http://localhost:3001/local/login', this.$data.model)
+        }
+      } catch (e) {
+        console.log(e)
       }
     },
     sendValidationCode: async function () {
-      this.$data.validationNotSend = true
-      const res = await fetch('http://localhost:3001/local/validationCode', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ phone: this.$data.model.phone }),
-        credentials: 'include'
-      })
-      const body = await res()
-      if (body.status === 'error') {
-        alert(body.message)
+      try {
+        const res = await axios.post('http://localhost:3001/local/validationCode', {
+          phone: this.$data.model.phone
+        })
+        if (res.status === 200 && res.data.message === 'ok') {
+          this.$data.validationNotSend = false
+        }
+      } catch (e) {
+        console.log(e)
       }
     }
   },
   computed: {
     submitDisabled: function () {
-      return this.$data.formValid === true
+      return this.$data.formValid !== true
     }
   },
   template: `
@@ -132,6 +126,9 @@ export default {
       v-on:click='sendValidationCode()'>
       Zaslat potvrzovací kod
     </button>
+    <span v-else>
+      Potvrzovací kod zaslán SMS na {{model.phone}}.
+    </span>
   </div>
   `
 }

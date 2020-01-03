@@ -12,7 +12,7 @@ export default {
   },
   methods: {
     login: async function () {
-      const res = await axios.post('/user', this.$data.record)
+      const res = await axios.post('http://localhost:3001/local/login', this.$data.record)
       return res.data
     }
   },
