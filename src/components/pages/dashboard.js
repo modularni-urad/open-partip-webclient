@@ -13,7 +13,8 @@ export default {
     <div class="row">
       <div class="col-sm-6">
         <div class="card" style="width: 18rem;">
-          <img src="..." class="card-img-top" alt="...">
+          <img class="card-img-top" alt="..."
+            src="https://trebicobcanum.net/wp-content/uploads/2017/03/chodnik-na-kopcich-1080x675.jpg">
           <div class="card-body">
             <h5 class="card-title">Participativní rozpočet</h5>
             <p class="card-text">
@@ -27,7 +28,7 @@ export default {
       </div>
       <div class="col-sm-6">
         <div class="card" style="width: 18rem;">
-          <img src="..." class="card-img-top" alt="...">
+          <img src="https://image.shutterstock.com/image-vector/settings-icon-isometric-template-web-600w-1129890074.jpg" class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title">Můj profil</h5>
             <p class="card-text">

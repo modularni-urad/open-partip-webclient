@@ -1,9 +1,33 @@
 
 export default {
   template: `
-    <div class="container mx-auto p-4">
-      <!-- component matched by the route will render here -->
-      <router-view></router-view>
+<div>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <router-link class="nav-link" to="/">Domů</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/profile">Můj profil</router-link>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="javascript:void(0);">Disabled</a>
+        </li>
+      </ul>
+      <button class="btn btn-warning">Odhlásit</button>
     </div>
+  </nav>
+
+  <div class="container mx-auto p-4">
+    <!-- component matched by the route will render here -->
+    <router-view></router-view>
+  </div>
+</div>
   `
 }
