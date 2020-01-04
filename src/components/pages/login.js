@@ -1,4 +1,4 @@
-/* global axios */
+/* global axios, AUTH_API */
 
 export default {
   data: () => {
@@ -7,13 +7,18 @@ export default {
         username: '',
         password: ''
       },
-      errors: {}
+      error: null
     }
   },
   methods: {
     login: async function () {
-      const res = await axios.post('http://localhost:3001/local/login', this.$data.record)
-      return res.data
+      try {
+        const res = await axios.post(`${AUTH_API}/login`, this.$data.record)
+        this.$router.push('/')
+        return res.data
+      } catch (err) {
+        this.$data.error = err.response.data
+      }
     }
   },
   computed: {
@@ -38,6 +43,8 @@ export default {
     <input type="password" name="pwd" class="form-control"
       v-model='record.password' placeholder="Heslo">
   </div>
+
+  <div clas="danger" v-if="error">Nesprávné přihlašovací údaje</div>
 
   <div class="d-flex justify-content-center mt-3 login_container">
     <button type="button" name="button" class="btn btn-primary" v-on:click="login" v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">

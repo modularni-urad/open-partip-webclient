@@ -1,4 +1,4 @@
-/* global Vue, VueFormGenerator, axios */
+/* global Vue, VueFormGenerator, axios, AUTH_API */
 
 VueFormGenerator.validators.resources.fieldIsRequired = 'Toto je povinné'
 VueFormGenerator.validators.resources.textTooSmall =
@@ -82,9 +82,10 @@ export default {
     },
     register: async function () {
       try {
-        let res = await axios.post('http://localhost:3001/local/register', this.$data.model)
+        let res = await axios.post(`${AUTH_API}/register`, this.$data.model)
         if (res.status === 200) {
-          res = await axios.post('http://localhost:3001/local/login', this.$data.model)
+          res = await axios.post(`${AUTH_API}/login`, this.$data.model)
+          this.$router.push('')
         }
       } catch (e) {
         console.log(e)
@@ -92,7 +93,7 @@ export default {
     },
     sendValidationCode: async function () {
       try {
-        const res = await axios.post('http://localhost:3001/local/validationCode', {
+        const res = await axios.post(`${AUTH_API}/validationCode`, {
           phone: this.$data.model.phone
         })
         if (res.status === 200 && res.data.message === 'ok') {
