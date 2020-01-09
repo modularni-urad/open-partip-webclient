@@ -1,4 +1,4 @@
-/* global Vue, VueMultiselect, axios, AUTH_API */
+/* global Vue, VueMultiselect, axios, API */
 
 Vue.component('multiselect', VueMultiselect.Multiselect)
 
@@ -23,10 +23,10 @@ export default {
               'Úřední', 'Sport', 'Městské bydlení',
               'Poruchy/Odstávky', 'Senioři', 'Mladé rodiny'
             ],
-            label: 'Zájmy',
+            label: 'Odebíraná témata',
             model: 'interrests',
             id: 'interests',
-            placeholder: '9 za sebou jdoucích číslic',
+            placeholder: 'vyberte si z menu',
             required: true
           }
         ]
@@ -38,37 +38,47 @@ export default {
       }
     }
   },
+  created () {
+    this.fetchData()
+  },
   methods: {
     onValidated: function (isValid, errors) {
       this.$data.formValid = isValid
     },
-    register: async function () {
+    save: async function () {
       try {
-        let res = await axios.post(`${AUTH_API}/register`, this.$data.model)
-        if (res.status === 200) {
-          res = await axios.post(`${AUTH_API}/login`, this.$data.model)
-          this.$router.push('')
-        }
+        this.$data.working = true
+        const joined = this.$data.model.interrests.join(',')
+        const data = Object.assign({}, this.$data.model, { interrests: joined })
+        const req = this.$data.model.uid
+          ? axios.put(`${API}/comm_prefs/${this.$data.model.uid}/`, data)
+          : axios.post(`${API}/comm_prefs/`, data)
+        await req
+        this.$data.working = false
       } catch (e) {
         console.log(e)
+        this.$data.working = false
       }
     },
-    sendValidationCode: async function () {
+    fetchData: async function () {
       try {
-        const res = await axios.post(`${AUTH_API}/validationCode`, {
-          phone: this.$data.model.phone
-        })
-        if (res.status === 200 && res.data.message === 'ok') {
-          this.$data.validationNotSend = false
-        }
+        const res = await axios.get(`${API}/comm_prefs/`)
+        res.data.interrests = res.data.interrests ? res.data.interrests.split(',') : []
+        this.$data.model = res.data
+        this.$data.working = false
       } catch (e) {
-        console.log(e)
+        if (e.response.status === 401) {
+          this.$store.commit('logout')
+          this.$router.push('/login')
+        } else {
+          console.log(e)
+        }
       }
     }
   },
   computed: {
     submitDisabled: function () {
-      return this.$data.formValid !== true
+      return this.$data.formValid !== true || this.$data.working
     }
   },
   template: `
@@ -80,7 +90,7 @@ export default {
       </vue-form-generator>
     </form>
 
-    <button type='submit' class='btn btn-primary' v-on:click='register()'
+    <button type='submit' class='btn btn-primary' v-on:click='save()'
       v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
       <b>Uložit</b>
     </button>

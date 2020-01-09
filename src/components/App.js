@@ -14,13 +14,24 @@ export default {
           <router-link class="nav-link" to="/">Domů</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/profile">Můj profil</router-link>
+          <router-link v-if="$store.state.user === null" class="nav-link" to="/register">
+            Registrovat se
+          </router-link>
+          <router-link v-else class="nav-link" to="/profile">
+            Můj profil
+          </router-link>
         </li>
         <li class="nav-item">
           <a class="nav-link disabled" href="javascript:void(0);">Disabled</a>
         </li>
       </ul>
-      <button class="btn btn-warning">Odhlásit</button>
+      <button v-if="$store.state.user !== null" class="btn btn-warning"
+        v-on:click="$store.commit('logout')">
+        Odhlásit
+      </button>
+      <router-link v-else class="btn btn-primary" to="/login">
+        Přihlásit
+      </router-link>
     </div>
   </nav>
 
