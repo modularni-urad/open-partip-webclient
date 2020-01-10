@@ -1,4 +1,4 @@
-/* global Vuex, localStorage, API, axios */
+/* global Vue, Vuex, localStorage, API, axios */
 
 const KEY = '_opencomm_user_'
 const savedUser = localStorage.getItem(KEY)
@@ -18,6 +18,11 @@ export default function (router) {
       login: (state, profile) => {
         localStorage.setItem(KEY, JSON.stringify(profile))
         state.user = profile
+      }
+    },
+    actions: {
+      toast: function (ctx, opts) {
+        Vue.$toast.open(opts)
       }
     }
   })

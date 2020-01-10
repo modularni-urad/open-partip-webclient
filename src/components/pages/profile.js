@@ -1,5 +1,4 @@
 /* global Vue, VueMultiselect, axios, API */
-
 Vue.component('multiselect', VueMultiselect.Multiselect)
 
 export default {
@@ -27,7 +26,8 @@ export default {
             model: 'interrests',
             id: 'interests',
             placeholder: 'vyberte si z menu',
-            required: true
+            required: true,
+            validator: 'nonEmptySelection'
           }
         ]
       },
@@ -55,6 +55,10 @@ export default {
           : axios.post(`${API}/comm_prefs/`, data)
         await req
         this.$data.working = false
+        this.$store.dispatch('toast', {
+          message: 'Uloženo',
+          type: 'success'
+        })
       } catch (e) {
         console.log(e)
         this.$data.working = false
@@ -94,6 +98,7 @@ export default {
       v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
       <b>Uložit</b>
     </button>
+    <i class="fas fa-spinner fa-spin" v-if="working"></i>
   </div>
   `
 }

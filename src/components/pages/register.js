@@ -10,6 +10,11 @@ Vue.use(VueFormGenerator, {
       if (value.length < 8) {
         return 'Heslo neodpovídá požadavkům'
       }
+    },
+    nonEmptySelection: function (value) {
+      if (!value.length) {
+        return 'Výběr nesmí být prázdný'
+      }
     }
   }
 })

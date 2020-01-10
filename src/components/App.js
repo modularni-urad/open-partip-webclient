@@ -1,3 +1,9 @@
+/* global Vue, VueToast */
+
+Vue.use(VueToast, {
+  // One of options
+  position: 'top-right'
+})
 
 export default {
   template: `
