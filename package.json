@@ -1,0 +1,13 @@
+{
+  "name": "open-partip-webclient",
+  "version": "0.1.0",
+  "author": "Vaclav Klecanda <vencax77@gmail.com> (http://vxk.cz)",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "browser-sync start --port 8080 --server 'src' --files 'src' --single"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.24.1"
+  }
+}
