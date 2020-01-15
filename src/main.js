@@ -10,6 +10,7 @@ import NewPassword from './components/pages/newpwd.js'
 
 import ParoApply from './components/pages/paro/apply.js'
 import ParoProjectList from './components/pages/paro/projectlist.js'
+import ParoProjDetail from './components/pages/paro/projectdetail.js'
 
 const router = new VueRouter({
   routes: [
@@ -19,6 +20,7 @@ const router = new VueRouter({
     { path: '/newpwd', component: NewPassword },
     { path: '/paro/:call_id', component: ParoProjectList, name: 'parocall' },
     { path: '/paro/:call_id/apply', component: ParoApply, name: 'paroapply' },
+    { path: '/paro/project/:id', component: ParoProjDetail, name: 'parodetail' },
     { path: '', component: Dashboard }
   ]
 })

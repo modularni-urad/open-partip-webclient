@@ -28,6 +28,7 @@ export default {
         name: '',
         desc: '',
         content: '',
+        budget: '',
         photo: '',
         total: ''
       },
@@ -60,6 +61,16 @@ export default {
             rows: 7,
             label: 'Úplný popis projektu včetně rozpočtu',
             model: 'content',
+            required: true,
+            hint: 'Můžete používat markdown',
+            max: 1024,
+            validator: 'string'
+          },
+          {
+            type: 'textArea',
+            rows: 7,
+            label: 'Rozpočet projektu',
+            model: 'budget',
             required: true,
             hint: 'Můžete používat markdown',
             max: 1024,
