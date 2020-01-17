@@ -18,7 +18,7 @@ export default {
         axios.get(`${API}/paro_proj/?call_id=${callId}`),
         axios.get(`${API}/paro_call/?id=${callId}`)
       ])
-      this.$data.projects = res[0].data.length ? res[0].data : null
+      this.$data.projects = res[0].data
       this.$data.call = res[1].data[0]
       this.$data.loading = false
     }

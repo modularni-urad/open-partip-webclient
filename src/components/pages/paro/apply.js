@@ -115,12 +115,13 @@ export default {
       try {
         this.$data.working = true
         const callId = this.$router.currentRoute.params.call_id
-        if (!model.call_id) model.call_id = callId
-        const res = model.id
-          ? axios.put(`${API}/paro_proj/${model.id}`, model)
-          : axios.post(`${API}/paro_proj/`, model)
-        await res
-        Object.assign(model, res.data)
+        if (model.id) {
+          await axios.put(`${API}/paro_proj/${model.id}`, model)
+        } else {
+          model.call_id = callId
+          const res = await axios.post(`${API}/paro_proj/`, model)
+          model.id = res.data[0]
+        }
         this.$data.working = false
       } catch (e) {
         console.log(e)
