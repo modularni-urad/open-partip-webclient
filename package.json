@@ -5,7 +5,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "browser-sync start --port 8080 --server 'src' --files 'src' --single"
+    "start": "browser-sync start --port 8080 --server 'src' --files 'src' --single",
+    "bundle": "rollup src/main.js --file dist/bundle.js --format iife"
   },
   "devDependencies": {
     "browser-sync": "^2.24.1"
