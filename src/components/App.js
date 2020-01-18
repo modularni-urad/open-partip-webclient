@@ -28,7 +28,9 @@ export default {
           </router-link>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" href="javascript:void(0);">Disabled</a>
+          <router-link v-if="$store.state.user !== null" class="nav-link" to="/chreg">
+            Změna registrace
+          </router-link>
         </li>
       </ul>
       <button v-if="$store.state.user !== null" class="btn btn-warning"
