@@ -1,7 +1,5 @@
 /* global axios, API, _, moment */
 
-// TODO: card-columns for da cards?
-
 export default {
   data: () => {
     return {
@@ -78,22 +76,20 @@ export default {
       </div>
     </div>
 
-    <div class="row d-inline-flex">
+    <div class="card-columns">
       <div v-if="projects.length === 0">Zatím žádné</div>
-      <div v-else v-for="p in projects" class="col-sm-12 col-md-6 col-lg-3">
-        <div class="card proj">
-          <img :src="p.photo" class="card-img-top projimg" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">{{p.name}}</h5>
-            <p class="card-text">{{p.desc}}</p>
-            <p class="card-text">Rozpočet: {{p.total}}</p>
-            <router-link :to="{name: 'parodetail', params: {id: p.id}}">
-              <button class="btn btn-primary">Detail ...</button>
-            </router-link>
-            <div v-if="canVote" class="btn-group" role="group">
-              <button type="button" class="btn btn-success">PRO</button>
-              <button type="button" class="btn btn-danger">PROTI</button>
-            </div>
+      <div v-for="p in projects" class="card proj">
+        <img :src="p.photo" class="card-img-top projimg" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">{{p.name}}</h5>
+          <p class="card-text">{{p.desc}}</p>
+          <p class="card-text">Rozpočet: {{p.total}}</p>
+          <router-link :to="{name: 'parodetail', params: {id: p.id}}">
+            <button class="btn btn-primary">Detail ...</button>
+          </router-link>
+          <div v-if="canVote" class="btn-group" role="group">
+            <button type="button" class="btn btn-success">PRO</button>
+            <button type="button" class="btn btn-danger">PROTI</button>
           </div>
         </div>
       </div>
