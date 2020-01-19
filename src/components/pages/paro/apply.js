@@ -47,6 +47,14 @@ export default {
             validator: 'string'
           },
           {
+            type: 'input',
+            inputType: 'text',
+            label: 'Obrázek projektu. Nahrát můžete např. přes https://1iq.cz/',
+            model: 'photo',
+            id: 'photo',
+            placeholder: 'zadejte adresu obrázku'
+          },
+          {
             type: 'textArea',
             rows: 3,
             label: 'Popis',
@@ -118,8 +126,7 @@ export default {
         if (model.id) {
           await axios.put(`${API}/paro_proj/${model.id}`, model)
         } else {
-          model.call_id = callId
-          const res = await axios.post(`${API}/paro_proj/`, model)
+          const res = await axios.post(`${API}/paro_proj/${callId}`, model)
           model.id = res.data[0]
         }
         this.$data.working = false

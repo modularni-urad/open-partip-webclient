@@ -43,7 +43,7 @@ export default {
     </div>
   </nav>
 
-  <div class="container mx-auto p-4">
+  <div class="container-fluid mx-auto p-4">
     <!-- component matched by the route will render here -->
     <router-view></router-view>
   </div>

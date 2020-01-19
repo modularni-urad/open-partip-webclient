@@ -20,8 +20,10 @@ export default {
       this.$data.project = p
       res = await axios.get(`${API}/paro_call/?id=${p.call_id}`)
       this.$data.call = res.data[0]
-      res = await axios.get(`${API}/paro_support/${projId}`)
-      this.$data.support = res.data.length > 0
+      if (this.$store.state.user) {
+        res = await axios.get(`${API}/paro_support/${projId}`)
+        this.$data.support = res.data.length > 0
+      }
       this.$data.loading = false
     },
     sendSupport: async function () {
@@ -43,7 +45,8 @@ export default {
       return marked(this.project.budget)
     },
     canSupport: function () {
-      return moment(this.call.submission_end) > moment() &&
+      return this.$store.state.user &&
+        moment(this.call.submission_end) > moment() &&
         this.project.state === 'new'
     },
     supportbutt: function () {
@@ -51,8 +54,8 @@ export default {
     }
   },
   template: `
-  <div class="container">
-    <div class="row" v-if="!loading">
+  <div v-if="!loading">
+    <div class="row">
       <div class="col-sm-12 col-md-6">
         <h2>{{project.name}}</h2>
 
@@ -61,19 +64,27 @@ export default {
         </router-link>
 
         <h4>{{project.desc}}</h4>
-        <h3>Rozpočet</h3>
-        <p v-html="budgetHTML">{{project.budget}}</p>
+
+        <p>{{project.content}}</p>
+
         <p>Celkem: {{project.total}}</p>
-        <div v-if="canSupport">
-          {{project.support_count}}
-          <button class="btn btn-primary" v-on:click='sendSupport()'>
-            {{supportbutt}}
-          </button>
-        </div>
       </div>
       <div class="col-sm-12 col-md-6">
         <img :src="project.photo" class="card-img-top" alt="...">
-        <p>{{project.content}}</p>
+
+        <h3>Rozpočet</h3>
+        <p v-html="budgetHTML">{{project.budget}}</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        "Líbí se mi" od {{project.support_count}} uživatelů.
+        <button v-if="canSupport" class="btn btn-primary"
+          v-on:click='sendSupport()'>
+          {{supportbutt}}
+        </button>
+        <span v-else>Pro udílení "Líbí se mi" se přihlašte</span>
       </div>
     </div>
   </div>
