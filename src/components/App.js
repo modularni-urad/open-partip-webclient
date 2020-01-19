@@ -20,6 +20,12 @@ export default {
           <router-link class="nav-link" to="/">Domů</router-link>
         </li>
         <li class="nav-item">
+          <router-link class="nav-link" to="/">Ankety</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/">Info Kanály</router-link>
+        </li>
+        <li class="nav-item">
           <router-link v-if="$store.state.user === null" class="nav-link" to="/register">
             Registrovat se
           </router-link>

@@ -79,7 +79,7 @@ export default {
     <div class="card-columns">
       <div v-if="projects.length === 0">Zatím žádné</div>
       <div v-for="p in projects" class="card proj">
-        <img :src="p.photo" class="card-img-top projimg" alt="...">
+        <img v-if="p.photo" :src="p.photo" class="card-img-top projimg" alt="...">
         <div class="card-body">
           <h5 class="card-title">{{p.name}}</h5>
           <p class="card-text">{{p.desc}}</p>

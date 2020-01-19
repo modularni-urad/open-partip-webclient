@@ -70,7 +70,7 @@ export default {
         <p>Celkem: {{project.total}}</p>
       </div>
       <div class="col-sm-12 col-md-6">
-        <img :src="project.photo" class="card-img-top" alt="...">
+        <img v-if="project.photo" :src="project.photo" class="card-img-top" alt="...">
 
         <h3>Rozpočet</h3>
         <p v-html="budgetHTML">{{project.budget}}</p>
@@ -84,6 +84,9 @@ export default {
           v-on:click='sendSupport()'>
           {{supportbutt}}
         </button>
+        <span class="alert alert-success" v-if="project.state === 'supprtd'">
+          Tento projekt již postoupil do další fáze.
+        </span>
         <span v-else>Pro udílení "Líbí se mi" se přihlašte</span>
       </div>
     </div>
