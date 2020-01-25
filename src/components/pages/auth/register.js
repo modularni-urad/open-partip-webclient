@@ -1,23 +1,4 @@
-/* global Vue, VueFormGenerator, axios, AUTH_API */
-
-VueFormGenerator.validators.resources.fieldIsRequired = 'Toto je povinné'
-VueFormGenerator.validators.resources.textTooSmall =
-  'Text je moc krátký! Teď: {0}, minimum: {1}'
-
-Vue.use(VueFormGenerator, {
-  validators: {
-    pwdComplexity: function (value) {
-      if (value.length < 8) {
-        return 'Heslo neodpovídá požadavkům'
-      }
-    },
-    nonEmptySelection: function (value) {
-      if (!value.length) {
-        return 'Výběr nesmí být prázdný'
-      }
-    }
-  }
-})
+/* global axios, AUTH_API */
 
 export default {
   data: () => {

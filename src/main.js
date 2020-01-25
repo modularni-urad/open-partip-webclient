@@ -1,5 +1,6 @@
-/* global Vue, VueRouter, moment */
+/* global Vue, VueRouter */
 import App from './components/App.js'
+import './vuecustoms.js'
 import Store from './store.js'
 
 import Register from './components/pages/auth/register.js'
@@ -13,12 +14,6 @@ import Profile from './components/pages/profile.js'
 import ParoApply from './components/pages/paro/apply.js'
 import ParoProjectList from './components/pages/paro/projectlist.js'
 import ParoProjDetail from './components/pages/paro/projectdetail.js'
-
-Vue.filter('formatDate', function (value) {
-  if (value) {
-    return moment(String(value)).format('DD.MM.YYYY')
-  }
-})
 
 const router = new VueRouter({
   routes: [
