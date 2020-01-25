@@ -13,7 +13,9 @@ export default {
   methods: {
     save: async function () {
       try {
-        const res = await axios.post(`${AUTH_API}/set-email`, this.$data.model)
+        const uid = this.$store.state.user._id
+        const url = `${AUTH_API}/set-email?uid=${uid}&email=${this.$data.model.email}`
+        const res = await axios.put(url)
         if (res.status === 200) {
           this.$data.message = 'Na novou adresu přijde potvrzovací mail'
         }
