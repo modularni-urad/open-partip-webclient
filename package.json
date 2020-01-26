@@ -6,9 +6,12 @@
   "private": true,
   "scripts": {
     "start": "browser-sync start --port 8080 --server 'src' --files 'src' --single",
-    "bundle": "rollup src/main.js --file dist/bundle.js --format iife"
+    "build": "rollup src/main.js --file dist/bundle.js --format iife"
   },
   "devDependencies": {
     "browser-sync": "^2.24.1"
+  },
+  "dependencies": {
+    "rollup": "^1.29.1"
   }
 }
