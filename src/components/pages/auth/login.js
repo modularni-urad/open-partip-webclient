@@ -8,12 +8,15 @@ export default {
         password: ''
       },
       error: null,
-      errcount: 0
+      errcount: 0,
+      working: false
     }
   },
   methods: {
     login: async function () {
       try {
+        this.$data.error = null
+        this.$data.working = true
         const res = await axios.post(`${AUTH_API}/login`, this.$data.record)
         await axios.post(`${API}/login`, null, {
           headers: {
@@ -26,6 +29,8 @@ export default {
       } catch (err) {
         this.$data.error = err.response.data
         this.$data.errcount++
+      } finally {
+        this.$data.working = false
       }
     }
   },
@@ -54,17 +59,19 @@ export default {
 
   <div clas="danger" v-if="error">
     Nesprávné přihlašovací údaje!
-    <router-link v-if="errcount > 4" to="/newpwd">
+    <router-link v-if="errcount > 0" to="/newpwd">
       Zapomenuté heslo?
     </router-link>
   </div>
 
   <div class="d-flex justify-content-center mt-3 login_container">
-    <button type="button" name="button" class="btn btn-primary" v-on:click="login" v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
+    <button type="button" name="button" class="btn btn-primary" v-on:click="login"
+      v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
       Přihlásit se
     </button>
-
-    <router-link to="/register">Registrovat se</router-link>
+    <div>
+      <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    </div>
   </div>
 </form>
   `
