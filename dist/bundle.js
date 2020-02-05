@@ -118,89 +118,70 @@
     })
   }
 
-  /* global axios, AUTH_API */
+  /* global axios, AUTH_API, Vue */
+  const validationMixin = window.vuelidate.validationMixin;
+  const validators = window.validators;
 
-  var Register = {
+  var Register = Vue.extend({
+    mixins: [validationMixin],
     data: () => {
       return {
         working: false,
         formValid: false,
         validationNotSend: true,
-        model: {
-          phone: '',
-          password: '',
-          email: '',
-          validcode: ''
-        },
-        schema: {
-          fields: [
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Telefon (9 čísel)',
-              model: 'phone',
-              id: 'phone',
-              placeholder: '9 za sebou jdoucích číslic',
-              featured: true,
-              required: true,
-              pattern: /\d{9}/,
-              validator: 'regexp'
-            },
-            {
-              type: 'input',
-              inputType: 'email',
-              label: 'E-mail (nepovinné)',
-              model: 'email',
-              placeholder: 'platná emailová adresa',
-              required: false,
-              validator: 'email'
-            },
-            {
-              type: 'input',
-              inputType: 'password',
-              label: 'Heslo',
-              model: 'password',
-              required: true,
-              hint: 'Minimalně 8 znaků, malá i velká písmena a číslice',
-              validator: 'pwdComplexity'
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Ověřovací kod (v SMS)',
-              model: 'validcode',
-              required: true,
-              pattern: /\d+/,
-              validator: 'regexp'
-            }
-          ]
-        },
-        formOptions: {
-          validateAfterLoad: true,
-          validateAfterChanged: true,
-          validateAsync: true
+        phone: '',
+        password: '',
+        email: '',
+        validcode: '',
+        agree: ''
+      }
+    },
+    validations: {
+      phone: {
+        required: validators.required,
+        a: validators.helpers.regex('alpha', /^\d{9}$/)
+      },
+      email: {
+        email: validators.email
+      },
+      password: {
+        pwdComplexity: function (value) {
+          return Boolean(value.length >= 8 && value.match(/[A-Z]+/) &&
+            value.match(/[a-z]+/) && value.match(/[0-9]+/))
+        }
+      },
+      validcode: {
+        required: validators.required
+      },
+      agree: {
+        required: function (val) {
+          return val === true
         }
       }
     },
     methods: {
-      onValidated: function (isValid, errors) {
-        this.$data.formValid = isValid;
-      },
       register: async function () {
         try {
-          let res = await axios.post(`${AUTH_API}/register`, this.$data.model);
+          let res = await axios.post(`${AUTH_API}/register`, this.$data);
           if (res.status === 200) {
-            res = await axios.post(`${AUTH_API}/login`, this.$data.model);
+            res = await axios.post(`${AUTH_API}/login`, this.$data);
             this.$router.push('');
           }
         } catch (e) {
           console.log(e);
         }
       },
+      submit: function () {
+        this.$v.$touch();
+        if (this.$v.$invalid) {
+          return false
+        }
+        return this.register()
+      },
       sendValidationCode: async function () {
         try {
           const res = await axios.post(`${AUTH_API}/validationCode`, {
-            phone: this.$data.model.phone
+            phone: this.$data.phone
           });
           if (res.status === 200 && res.data.message === 'ok') {
             this.$data.validationNotSend = false;
@@ -210,35 +191,126 @@
         }
       }
     },
-    computed: {
-      submitDisabled: function () {
-        return this.$data.formValid !== true
-      }
-    },
     template: `
   <div>
     <h1>Registrace</h1>
     <form>
-      <vue-form-generator :schema="schema" :model="model"
-        :options="formOptions" @validated="onValidated">
-      </vue-form-generator>
+      <div class="row">
+        <div class="col">
+          <b-form-group
+            :state="!$v.phone.$error"
+            label="Telefon (9 čísel)"
+            label-for="phone-input"
+            invalid-feedback="Telefonní číslo není správné"
+          >
+            <b-form-input
+              id="phone-input"
+              type="number"
+              placeholder="9 za sebou jdoucích číslic"
+              v-model="$v.phone.$model"
+              :state="!$v.phone.$error"
+            ></b-form-input>
+          </b-form-group>
+        </div>
+
+        <div class="col">
+          <b-form-group
+            :state="!$v.email.$error"
+            label="E-mail (nepovinné)"
+            label-for="email-input"
+            invalid-feedback="Platná emailová adresa, prosím"
+          >
+            <b-form-input
+              id="email-input"
+              placeholder='platná emailová adresa'
+              v-model="$v.email.$model"
+              :state="!$v.email.$error"
+            ></b-form-input>
+          </b-form-group>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <b-form-group
+            :state="!$v.password.$error"
+            label="Heslo"
+            label-for="password-input"
+            invalid-feedback="Heslo neodpovídá požadavkům"
+          >
+            <b-form-input
+              type="password"
+              id="password-input"
+              placeholder="Minimalně 8 znaků, malá i velká písmena a číslice"
+              v-model="$v.password.$model"
+              :state="!$v.password.$error"
+            ></b-form-input>
+          </b-form-group>
+        </div>
+
+        <div class="col">
+          <div class="row">
+            <div class="col">
+              <b-form-group
+                :state="!$v.validcode.$error"
+                label="Ověřovací kod (v SMS)"
+                label-for="validcode-input"
+                invalid-feedback="Ověřovací kód je povinný"
+              >
+                <b-form-input
+                  type="number"
+                  id="validcode-input"
+                  placeholder="kód, který přišel v SMS"
+                  v-model="$v.validcode.$model"
+                  :state="!$v.validcode.$error"
+                ></b-form-input>
+              </b-form-group>
+            </div>
+            <div class="col">
+              <b-button v-if="validationNotSend" class='btn btn-secondary'
+                @click='sendValidationCode'>
+                Zaslat ověřovací kod
+              </b-button>
+              <span v-else>
+                Potvrzovací kod zaslán SMS na {{model.phone}}.
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <hr/>
+
+      <div class="row">
+        <div class="col">
+          <div>
+            Tady bude platny disclaimer, kompatibilni s GDPR
+          </div>
+          <b-form-group
+            :state="!$v.agree.$error"
+            label-for="checkbox-agree"
+            invalid-feedback="Souhlas je vyžadován"
+          >
+            <b-form-checkbox
+              id="checkbox-agree"
+              v-model="$v.agree.$model"
+              :state="!$v.agree.$error"
+            >
+              Souhlasím s podmínkami provozu
+            </b-form-checkbox>
+          </b-form-group>
+        </div>
+      </div>
+
     </form>
 
-    <button type='submit' class='btn btn-primary' v-on:click='register()'
-      v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
-      <b>Registrovat</b>
-    </button>
+    <b-button class="mt-3" :disabled="$v.$anyError" @click="submit">
+      <b>Registrovat</b> <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    </b-button>
 
-    <button v-if="validationNotSend" type='submit' class='btn btn-secondary'
-      v-on:click='sendValidationCode()'>
-      Zaslat potvrzovací kod
-    </button>
-    <span v-else>
-      Potvrzovací kod zaslán SMS na {{model.phone}}.
-    </span>
   </div>
   `
-  };
+  });
 
   /* global axios, API, AUTH_API */
 
@@ -250,12 +322,15 @@
           password: ''
         },
         error: null,
-        errcount: 0
+        errcount: 0,
+        working: false
       }
     },
     methods: {
       login: async function () {
         try {
+          this.$data.error = null;
+          this.$data.working = true;
           const res = await axios.post(`${AUTH_API}/login`, this.$data.record);
           await axios.post(`${API}/login`, null, {
             headers: {
@@ -268,6 +343,8 @@
         } catch (err) {
           this.$data.error = err.response.data;
           this.$data.errcount++;
+        } finally {
+          this.$data.working = false;
         }
       }
     },
@@ -296,17 +373,19 @@
 
   <div clas="danger" v-if="error">
     Nesprávné přihlašovací údaje!
-    <router-link v-if="errcount > 4" to="/newpwd">
+    <router-link v-if="errcount > 0" to="/newpwd">
       Zapomenuté heslo?
     </router-link>
   </div>
 
   <div class="d-flex justify-content-center mt-3 login_container">
-    <button type="button" name="button" class="btn btn-primary" v-on:click="login" v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
+    <button type="button" name="button" class="btn btn-primary" v-on:click="login"
+      v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
       Přihlásit se
     </button>
-
-    <router-link to="/register">Registrovat se</router-link>
+    <div>
+      <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    </div>
   </div>
 </form>
   `
