@@ -61,7 +61,7 @@ export default Vue.extend({
     sendValidationCode: async function () {
       try {
         const res = await axios.post(`${AUTH_API}/validationCode`, {
-          phone: this.$data.phone
+          phone: Number(this.$data.phone)
         })
         if (res.status === 200 && res.data.message === 'ok') {
           this.$data.validationNotSend = false

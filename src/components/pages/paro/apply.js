@@ -24,7 +24,9 @@ export default Vue.extend({
       required: validators.required
     },
     photo: {
-      required: validators.required
+      https: function (value) {
+        return (value && Boolean(value.match(/^https:\/\/+/))) || !value
+      }
     },
     desc: {
       required: validators.required,
@@ -58,7 +60,7 @@ export default Vue.extend({
       return this.save()
     },
     save: async function () {
-      const model = this.$data.model
+      const model = this.$data
       try {
         this.$data.working = true
         const callId = this.$router.currentRoute.params.call_id
@@ -68,9 +70,14 @@ export default Vue.extend({
           const res = await axios.post(`${API}/paro_proj/${callId}`, model)
           model.id = res.data[0]
         }
-        this.$data.working = false
+        this.$store.dispatch('toast', {
+          message: 'Uloženo',
+          type: 'success'
+        })
       } catch (e) {
+        this.$store.dispatch('toast', { message: e, type: 'error' })
         console.log(e)
+      } finally {
         this.$data.working = false
       }
     }
@@ -85,7 +92,7 @@ export default Vue.extend({
             :state="!$v.name.$error"
             label="Název projektu"
             label-for="name-input"
-            invalid-feedback="Název je povinný a musí být maximílně 32 znaků dlouhý"
+            invalid-feedback="Název je povinný a musí být maximálně 32 znaků dlouhý"
           >
             <b-form-input
               id="name-input"
@@ -99,7 +106,7 @@ export default Vue.extend({
             :state="!$v.desc.$error"
             label="Stručný popis projektu"
             label-for="desc-input"
-            invalid-feedback="Název je povinný a musí být maximílně 32 znaků dlouhý"
+            invalid-feedback="Popis je povinný a musí být maximálně 128 znaků dlouhý"
             description="Můžete používat markdown"
           >
             <b-form-textarea
@@ -115,7 +122,7 @@ export default Vue.extend({
             :state="!$v.content.$error"
             label="Úplný popis projektu"
             label-for="content-input"
-            invalid-feedback="Název je povinný a musí být maximílně 32 znaků dlouhý"
+            invalid-feedback="Úplný popis je povinný"
             description="Můžete používat markdown"
           >
             <b-form-textarea
@@ -146,10 +153,14 @@ export default Vue.extend({
 
           <b-form-group
             :state="!$v.photo.$error"
-            label="Obrázek projektu. Nahrát můžete např. přes https://1iq.cz/"
+            label="Obrázek projektu"
             label-for="photo-input"
-            invalid-feedback="Název je povinný a musí být maximílně 32 znaků dlouhý"
+            invalid-feedback="adresa obrázku musí začínat https"
           >
+            <template slot="description">
+              Nahrát můžete např. přes <a href="https://1iq.cz/" target="_blank">1iq.cz</a>
+            </template>
+
             <b-form-input
               id="photo-input"
               placeholder="zadejte adresu obrázku"
