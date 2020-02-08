@@ -60,27 +60,7 @@
   `
   };
 
-  /* global Vue, moment, VueFormGenerator */
-
-  VueFormGenerator.validators.resources.fieldIsRequired = 'Toto je povinné';
-  VueFormGenerator.validators.resources.textTooSmall =
-    'Text je moc krátký! Teď: {0}, minimum: {1}';
-
-  Vue.use(VueFormGenerator, {
-    validators: {
-      pwdComplexity: function (value) {
-        if (value.length < 8 || !value.match(/[A-Z]+/) ||
-          !value.match(/[a-z]+/) || !value.match(/[0-9]+/)) {
-          return 'Heslo neodpovídá požadavkům'
-        }
-      },
-      nonEmptySelection: function (value) {
-        if (!value.length) {
-          return 'Výběr nesmí být prázdný'
-        }
-      }
-    }
-  });
+  /* global Vue, moment */
 
   Vue.filter('formatDate', function (value) {
     if (value) {
@@ -181,7 +161,7 @@
       sendValidationCode: async function () {
         try {
           const res = await axios.post(`${AUTH_API}/validationCode`, {
-            phone: this.$data.phone
+            phone: Number(this.$data.phone)
           });
           if (res.status === 200 && res.data.message === 'ok') {
             this.$data.validationNotSend = false;
@@ -391,67 +371,47 @@
   `
   };
 
-  /* global axios, AUTH_API */
+  /* global axios, Vue, AUTH_API */
+  const validationMixin$1 = window.vuelidate.validationMixin;
+  const validators$1 = window.validators;
 
-  var NewPassword = {
+  var NewPassword = Vue.extend({
+    mixins: [validationMixin$1],
     data: () => {
       return {
         working: false,
-        formValid: false,
         validationNotSend: true,
-        model: {
-          phone: '',
-          password: '',
-          validcode: ''
-        },
-        schema: {
-          fields: [
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Telefon (9 čísel)',
-              model: 'phone',
-              id: 'phone',
-              placeholder: '9 za sebou jdoucích číslic',
-              featured: true,
-              required: true,
-              pattern: /\d{9}/,
-              validator: 'regexp'
-            },
-            {
-              type: 'input',
-              inputType: 'password',
-              label: 'Heslo',
-              model: 'password',
-              required: true,
-              hint: 'Minimalně 8 znaků, malá i velká písmena a číslice',
-              validator: 'pwdComplexity'
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Ověřovací kod (v SMS)',
-              model: 'validcode',
-              required: true,
-              pattern: /\d+/,
-              validator: 'regexp'
-            }
-          ]
-        },
-        formOptions: {
-          validateAfterLoad: true,
-          validateAfterChanged: true,
-          validateAsync: true
+        phone: '',
+        password: '',
+        validcode: ''
+      }
+    },
+    validations: {
+      phone: {
+        required: validators$1.required,
+        a: validators$1.helpers.regex('alpha', /^\d{9}$/)
+      },
+      password: {
+        pwdComplexity: function (value) {
+          return Boolean(value.length >= 8 && value.match(/[A-Z]+/) &&
+            value.match(/[a-z]+/) && value.match(/[0-9]+/))
         }
+      },
+      validcode: {
+        required: validators$1.required
       }
     },
     methods: {
-      onValidated: function (isValid, errors) {
-        this.$data.formValid = isValid;
+      submit: function () {
+        this.$v.$touch();
+        if (this.$v.$invalid) {
+          return false
+        }
+        return this.send()
       },
-      register: async function () {
+      send: async function () {
         try {
-          const res = await axios.post(`${AUTH_API}/change-password`, this.$data.model);
+          const res = await axios.post(`${AUTH_API}/change-password`, this.$data);
           if (res.status === 200) {
             this.$router.push('/login');
           }
@@ -462,7 +422,7 @@
       sendValidationCode: async function () {
         try {
           const res = await axios.post(`${AUTH_API}/validationcode`, {
-            phone: this.$data.model.phone
+            phone: Number(this.$data.phone)
           });
           if (res.status === 200 && res.data.message === 'ok') {
             this.$data.validationNotSend = false;
@@ -472,35 +432,77 @@
         }
       }
     },
-    computed: {
-      submitDisabled: function () {
-        return this.$data.formValid !== true
-      }
-    },
     template: `
   <div>
     <h1>Změna hesla</h1>
     <form>
-      <vue-form-generator :schema="schema" :model="model"
-        :options="formOptions" @validated="onValidated">
-      </vue-form-generator>
+
+      <b-form-group
+        :state="!$v.phone.$error"
+        label="Telefon (9 čísel)"
+        label-for="phone-input"
+        invalid-feedback="Telefonní číslo není správné"
+      >
+        <b-form-input
+          id="phone-input"
+          type="number"
+          placeholder="9 za sebou jdoucích číslic"
+          v-model="$v.phone.$model"
+          :state="!$v.phone.$error"
+        ></b-form-input>
+      </b-form-group>
+
+      <b-form-group
+        :state="!$v.password.$error"
+        label="Nové heslo"
+        label-for="password-input"
+        invalid-feedback="Heslo neodpovídá požadavkům"
+      >
+        <b-form-input
+          type="password"
+          id="password-input"
+          placeholder="Minimalně 8 znaků, malá i velká písmena a číslice"
+          v-model="$v.password.$model"
+          :state="!$v.password.$error"
+        ></b-form-input>
+      </b-form-group>
+
+      <div class="row">
+        <div class="col">
+          <b-form-group
+            :state="!$v.validcode.$error"
+            label="Ověřovací kod (v SMS)"
+            label-for="validcode-input"
+            invalid-feedback="Ověřovací kód je povinný"
+          >
+            <b-form-input
+              type="number"
+              id="validcode-input"
+              placeholder="kód, který přišel v SMS"
+              v-model="$v.validcode.$model"
+              :state="!$v.validcode.$error"
+            ></b-form-input>
+          </b-form-group>
+        </div>
+        <div class="col">
+          <b-button v-if="validationNotSend" class='btn btn-secondary'
+            @click='sendValidationCode'>
+            Zaslat ověřovací kod
+          </b-button>
+          <span v-else>
+            Potvrzovací kod zaslán SMS na {{model.phone}}.
+          </span>
+        </div>
+      </div>
+
     </form>
 
-    <button type='submit' class='btn btn-primary' v-on:click='register()'
-      v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
-      <b>Uložit</b>
-    </button>
-
-    <button v-if="validationNotSend" type='submit' class='btn btn-secondary'
-      v-on:click='sendValidationCode()'>
-      Zaslat potvrzovací kod
-    </button>
-    <span v-else>
-      Potvrzovací kod zaslán SMS na {{model.phone}}.
-    </span>
+    <b-button class="mt-3" :disabled="$v.$anyError" @click="submit">
+      <b>Odeslat</b> <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    </b-button>
   </div>
   `
-  };
+  });
 
   /* global axios, AUTH_API */
 
@@ -578,8 +580,7 @@
     <div class="card-group">
 
       <div class="card">
-        <img class="card-img-top" alt="..."
-          src="https://trebicobcanum.net/wp-content/uploads/2017/03/chodnik-na-kopcich-1080x675.jpg">
+        <img class="card-img-top" alt="ikona k paro" src="paro.jpg">
         <div class="card-body">
           <h5 class="card-title">Participativní rozpočet</h5>
           <p class="card-text">
@@ -597,8 +598,7 @@
       </div>
 
       <div class="card">
-        <img class="card-img-top" alt="..."
-          src="http://www.lipnicens.unas.cz/anketa/anketa.jpg">
+        <img class="card-img-top" alt="ikona anketa" src="anketa.jpg">
         <div class="card-body">
           <h5 class="card-title">Ankety</h5>
           <p class="card-text">
@@ -612,8 +612,7 @@
       </div>
 
       <div class="card">
-        <img class="card-img-top" alt="..."
-          src="http://www.caoh.cz/img/blog/img15102239871000.jpg">
+        <img class="card-img-top" alt="ikona k informacím" src="info.jpg">
         <div class="card-body">
           <h5 class="card-title">Info kanály</h5>
           <p class="card-text">
@@ -631,43 +630,28 @@
   `
   };
 
-  /* global Vue, VueMultiselect, axios, API */
-  Vue.component('multiselect', VueMultiselect.Multiselect);
+  /* global Vue, VueMultiselect, axios, API, _ */
+  const validationMixin$2 = window.vuelidate.validationMixin;
 
-  var Profile = {
+  var Profile = Vue.extend({
+    mixins: [validationMixin$2],
+    components: { Multiselect: VueMultiselect.Multiselect },
     data: () => {
       return {
         working: false,
         formValid: false,
-        model: {
-          interrests: ''
-        },
-        schema: {
-          fields: [
-            {
-              type: 'vueMultiSelect',
-              selectOptions: {
-                multiple: true,
-                closeOnSelect: false
-              },
-              values: [
-                'Doprava', 'Krize', 'Kultura',
-                'Úřední', 'Sport', 'Městské bydlení',
-                'Poruchy/Odstávky', 'Senioři', 'Mladé rodiny'
-              ],
-              label: 'Odebíraná témata',
-              model: 'interrests',
-              id: 'interests',
-              placeholder: 'vyberte si z menu',
-              required: true,
-              validator: 'nonEmptySelection'
-            }
-          ]
-        },
-        formOptions: {
-          validateAfterLoad: true,
-          validateAfterChanged: true,
-          validateAsync: true
+        interrests: 'Krize',
+        options: [
+          'Doprava', 'Krize', 'Kultura',
+          'Úřední', 'Sport', 'Městské bydlení',
+          'Poruchy/Odstávky', 'Senioři', 'Mladé rodiny'
+        ]
+      }
+    },
+    validations: {
+      interrests: {
+        goodSelection: function (value) {
+          return value.length >= 0
         }
       }
     },
@@ -675,17 +659,20 @@
       this.fetchData();
     },
     methods: {
-      onValidated: function (isValid, errors) {
-        this.$data.formValid = isValid;
+      submit: function () {
+        this.$v.$touch();
+        if (this.$v.$invalid) {
+          return false
+        }
+        return this.save()
       },
       save: async function () {
         try {
           this.$data.working = true;
-          const joined = this.$data.model.interrests.join(',');
-          const data = Object.assign({}, this.$data.model, { interrests: joined });
-          const req = this.$data.model.uid
-            ? axios.put(`${API}/comm_prefs/${this.$data.model.uid}/`, data)
-            : axios.post(`${API}/comm_prefs/`, data);
+          const data = { interrests: this.$data.interrests.join(',') };
+          const req = this.$data.uid
+            ? axios.put(`${API}/comm_prefs/${this.$data.uid}/`, data)
+            : axios.post(`${API}/comm_prefs/`, _.extend(data, { uid: this.$data.uid }));
           await req;
           this.$data.working = false;
           this.$store.dispatch('toast', {
@@ -701,7 +688,7 @@
         try {
           const res = await axios.get(`${API}/comm_prefs/`);
           res.data.interrests = res.data.interrests ? res.data.interrests.split(',') : [];
-          this.$data.model = res.data;
+          Object.assign(this.$data, res.data);
           this.$data.working = false;
         } catch (e) {
           if (e.response.status === 401) {
@@ -713,132 +700,93 @@
         }
       }
     },
-    computed: {
-      submitDisabled: function () {
-        return this.$data.formValid !== true || this.$data.working
-      }
-    },
     template: `
   <div>
     <h1>Můj profil</h1>
     <form>
-      <vue-form-generator :schema="schema" :model="model"
-        :options="formOptions" @validated="onValidated">
-      </vue-form-generator>
+      <b-form-group
+        :state="!$v.interrests.$error"
+        label="Odebíraná témata"
+        label-for="budget-input"
+        invalid-feedback="je nutné si vybra"
+      >
+        <multiselect v-model="interrests" :options="options"
+          placeholder="vyberte si z menu"
+          :multiple="true">
+        </multiselect>
+      </b-form-group>
     </form>
 
-    <button type='submit' class='btn btn-primary' v-on:click='save()'
-      v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
-      <b>Uložit</b>
-    </button>
-    <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    <b-button class="mt-3 btn btn-primary" :disabled="$v.$anyError" @click="submit">
+      <b>Uložit</b> <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    </b-button>
   </div>
   `
-  };
+  });
 
-  /* global axios, API */
+  /* global axios, API, Vue */
+  const validationMixin$3 = window.vuelidate.validationMixin;
+  const validators$2 = window.validators;
 
-  var ParoApply = {
+  var ParoApply = Vue.extend({
+    mixins: [validationMixin$3],
     data: () => {
       return {
         working: false,
-        formValid: false,
-        model: {
-          name: '',
-          desc: '',
-          content: '',
-          budget: '',
-          photo: '',
-          total: ''
-        },
-        schema: {
-          fields: [
-            {
-              type: 'input',
-              inputType: 'text',
-              label: 'Název projektu',
-              model: 'name',
-              id: 'name',
-              placeholder: 'zadejte název projektu',
-              featured: true,
-              required: true,
-              max: 32,
-              validator: 'string'
-            },
-            {
-              type: 'input',
-              inputType: 'text',
-              label: 'Obrázek projektu. Nahrát můžete např. přes https://1iq.cz/',
-              model: 'photo',
-              id: 'photo',
-              placeholder: 'zadejte adresu obrázku'
-            },
-            {
-              type: 'textArea',
-              rows: 3,
-              label: 'Popis',
-              model: 'desc',
-              required: true,
-              hint: 'stručný popis projektu',
-              max: 128,
-              validator: 'string'
-            },
-            {
-              type: 'textArea',
-              rows: 7,
-              label: 'Úplný popis projektu včetně rozpočtu',
-              model: 'content',
-              required: true,
-              hint: 'Můžete používat markdown',
-              max: 1024,
-              validator: 'string'
-            },
-            {
-              type: 'textArea',
-              rows: 7,
-              label: 'Rozpočet projektu',
-              model: 'budget',
-              required: true,
-              hint: 'Můžete používat markdown',
-              max: 1024,
-              validator: 'string'
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Celkové náklady s DPH',
-              model: 'total',
-              placeholder: 'zadejte číslo',
-              required: true,
-              validator: 'integer'
-            }
-          ]
-        },
-        formOptions: {
-          validateAfterLoad: true,
-          validateAfterChanged: true,
-          validateAsync: true
+        name: '',
+        desc: '',
+        content: '',
+        budget: '',
+        photo: '',
+        total: ''
+      }
+    },
+    validations: {
+      name: {
+        required: validators$2.required,
+        maxLength: validators$2.maxLength(32)
+      },
+      total: {
+        required: validators$2.required
+      },
+      photo: {
+        https: function (value) {
+          return (value && Boolean(value.match(/^https:\/\/+/))) || !value
         }
+      },
+      desc: {
+        required: validators$2.required,
+        maxLength: validators$2.maxLength(128)
+      },
+      budget: {
+        required: validators$2.required
+      },
+      content: {
+        required: validators$2.required
       }
     },
     created () {
       this.fetchData();
     },
     methods: {
-      onValidated: function (isValid, errors) {
-        this.$data.formValid = isValid;
-      },
       fetchData: async function () {
         this.$data.working = true;
         const callId = this.$router.currentRoute.params.call_id;
         const author = this.$store.state.user._id;
         const url = `${API}/paro_proj/?call_id=${callId}&author=${author}`;
         const res = await axios.get(url);
-        if (res.data.length > 0) this.$data.model = res.data[0];
+        if (res.data.length > 0) Object.assign(this.$data, res.data[0]);
         this.$data.working = false;
       },
+      submit: function () {
+        this.$v.$touch();
+        if (this.$v.$invalid) {
+          return false
+        }
+        return this.save()
+      },
       save: async function () {
-        const model = this.$data.model;
+        const model = this.$data;
         try {
           this.$data.working = true;
           const callId = this.$router.currentRoute.params.call_id;
@@ -848,35 +796,129 @@
             const res = await axios.post(`${API}/paro_proj/${callId}`, model);
             model.id = res.data[0];
           }
-          this.$data.working = false;
+          this.$store.dispatch('toast', {
+            message: 'Uloženo',
+            type: 'success'
+          });
         } catch (e) {
+          this.$store.dispatch('toast', { message: e, type: 'error' });
           console.log(e);
+        } finally {
           this.$data.working = false;
         }
-      }
-    },
-    computed: {
-      submitDisabled: function () {
-        return this.$data.formValid !== true || this.$data.working
       }
     },
     template: `
   <div>
     <h1>Můj projekt</h1>
     <form>
-      <vue-form-generator :schema="schema" :model="model"
-        :options="formOptions" @validated="onValidated">
-      </vue-form-generator>
+      <div class="row">
+        <div class="col">
+          <b-form-group
+            :state="!$v.name.$error"
+            label="Název projektu"
+            label-for="name-input"
+            invalid-feedback="Název je povinný a musí být maximálně 32 znaků dlouhý"
+          >
+            <b-form-input
+              id="name-input"
+              placeholder="zadejte název projektu"
+              v-model="$v.name.$model"
+              :state="!$v.name.$error"
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            :state="!$v.desc.$error"
+            label="Stručný popis projektu"
+            label-for="desc-input"
+            invalid-feedback="Popis je povinný a musí být maximálně 128 znaků dlouhý"
+            description="Můžete používat markdown"
+          >
+            <b-form-textarea
+              id="desc-input"
+              placeholder="stručný popis projektu"
+              v-model="$v.desc.$model"
+              :state="!$v.desc.$error"
+              rows="4"
+            ></b-form-textarea>
+          </b-form-group>
+
+          <b-form-group
+            :state="!$v.content.$error"
+            label="Úplný popis projektu"
+            label-for="content-input"
+            invalid-feedback="Úplný popis je povinný"
+            description="Můžete používat markdown"
+          >
+            <b-form-textarea
+              id="content-input"
+              placeholder="Můžete používat markdown"
+              v-model="$v.content.$model"
+              :state="!$v.content.$error"
+              rows="10"
+            ></b-form-textarea>
+          </b-form-group>
+
+        </div>
+        <div class="col">
+          <b-form-group
+            :state="!$v.total.$error"
+            label="Celkové náklady s DPH"
+            label-for="total-input"
+            invalid-feedback="Toto je povinné"
+          >
+            <b-form-input
+              id="total-input"
+              type="number"
+              placeholder="zadejte číslo"
+              v-model="$v.total.$model"
+              :state="!$v.total.$error"
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            :state="!$v.photo.$error"
+            label="Obrázek projektu"
+            label-for="photo-input"
+            invalid-feedback="adresa obrázku musí začínat https"
+          >
+            <template slot="description">
+              Nahrát můžete např. přes <a href="https://1iq.cz/" target="_blank">1iq.cz</a>
+            </template>
+
+            <b-form-input
+              id="photo-input"
+              placeholder="zadejte adresu obrázku"
+              v-model="$v.photo.$model"
+              :state="!$v.photo.$error"
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            :state="!$v.budget.$error"
+            label="Rozpočet projektu"
+            label-for="budget-input"
+            invalid-feedback="Rozpočet projektu je povinný a musí být maximílně 128 znaků dlouhý"
+          >
+            <b-form-textarea
+              id="budget-input"
+              placeholder="Můžete používat markdown"
+              v-model="$v.budget.$model"
+              :state="!$v.budget.$error"
+              rows="10"
+            ></b-form-textarea>
+          </b-form-group>
+        </div>
+      </div>
     </form>
 
-    <button type='submit' class='btn btn-primary' v-on:click='save()'
-      v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
-      <b>Uložit</b>
-    </button>
-    <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    <b-button class="mt-3 btn btn-primary" :disabled="$v.$anyError" @click="submit">
+      <b>Uložit</b> <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    </b-button>
   </div>
   `
-  };
+  });
 
   /* global axios, API, _, moment */
 

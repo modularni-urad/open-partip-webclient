@@ -27,8 +27,7 @@ export default {
     <div class="card-group">
 
       <div class="card">
-        <img class="card-img-top" alt="..."
-          src="https://trebicobcanum.net/wp-content/uploads/2017/03/chodnik-na-kopcich-1080x675.jpg">
+        <img class="card-img-top" alt="ikona k paro" src="paro.jpg">
         <div class="card-body">
           <h5 class="card-title">Participativní rozpočet</h5>
           <p class="card-text">
@@ -46,8 +45,7 @@ export default {
       </div>
 
       <div class="card">
-        <img class="card-img-top" alt="..."
-          src="http://www.lipnicens.unas.cz/anketa/anketa.jpg">
+        <img class="card-img-top" alt="ikona anketa" src="anketa.jpg">
         <div class="card-body">
           <h5 class="card-title">Ankety</h5>
           <p class="card-text">
@@ -61,8 +59,7 @@ export default {
       </div>
 
       <div class="card">
-        <img class="card-img-top" alt="..."
-          src="http://www.caoh.cz/img/blog/img15102239871000.jpg">
+        <img class="card-img-top" alt="ikona k informacím" src="info.jpg">
         <div class="card-body">
           <h5 class="card-title">Info kanály</h5>
           <p class="card-text">
