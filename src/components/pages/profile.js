@@ -1,40 +1,25 @@
-/* global Vue, VueMultiselect, axios, API */
-Vue.component('multiselect', VueMultiselect.Multiselect)
+/* global Vue, VueMultiselect, axios, API, _ */
+const validationMixin = window.vuelidate.validationMixin
 
-export default {
+export default Vue.extend({
+  mixins: [validationMixin],
+  components: { Multiselect: VueMultiselect.Multiselect },
   data: () => {
     return {
       working: false,
       formValid: false,
-      model: {
-        interrests: ''
-      },
-      schema: {
-        fields: [
-          {
-            type: 'vueMultiSelect',
-            selectOptions: {
-              multiple: true,
-              closeOnSelect: false
-            },
-            values: [
-              'Doprava', 'Krize', 'Kultura',
-              'Úřední', 'Sport', 'Městské bydlení',
-              'Poruchy/Odstávky', 'Senioři', 'Mladé rodiny'
-            ],
-            label: 'Odebíraná témata',
-            model: 'interrests',
-            id: 'interests',
-            placeholder: 'vyberte si z menu',
-            required: true,
-            validator: 'nonEmptySelection'
-          }
-        ]
-      },
-      formOptions: {
-        validateAfterLoad: true,
-        validateAfterChanged: true,
-        validateAsync: true
+      interrests: 'Krize',
+      options: [
+        'Doprava', 'Krize', 'Kultura',
+        'Úřední', 'Sport', 'Městské bydlení',
+        'Poruchy/Odstávky', 'Senioři', 'Mladé rodiny'
+      ]
+    }
+  },
+  validations: {
+    interrests: {
+      goodSelection: function (value) {
+        return value.length >= 0
       }
     }
   },
@@ -42,17 +27,20 @@ export default {
     this.fetchData()
   },
   methods: {
-    onValidated: function (isValid, errors) {
-      this.$data.formValid = isValid
+    submit: function () {
+      this.$v.$touch()
+      if (this.$v.$invalid) {
+        return false
+      }
+      return this.save()
     },
     save: async function () {
       try {
         this.$data.working = true
-        const joined = this.$data.model.interrests.join(',')
-        const data = Object.assign({}, this.$data.model, { interrests: joined })
-        const req = this.$data.model.uid
-          ? axios.put(`${API}/comm_prefs/${this.$data.model.uid}/`, data)
-          : axios.post(`${API}/comm_prefs/`, data)
+        const data = { interrests: this.$data.interrests.join(',') }
+        const req = this.$data.uid
+          ? axios.put(`${API}/comm_prefs/${this.$data.uid}/`, data)
+          : axios.post(`${API}/comm_prefs/`, _.extend(data, { uid: this.$data.uid }))
         await req
         this.$data.working = false
         this.$store.dispatch('toast', {
@@ -68,7 +56,7 @@ export default {
       try {
         const res = await axios.get(`${API}/comm_prefs/`)
         res.data.interrests = res.data.interrests ? res.data.interrests.split(',') : []
-        this.$data.model = res.data
+        Object.assign(this.$data, res.data)
         this.$data.working = false
       } catch (e) {
         if (e.response.status === 401) {
@@ -80,25 +68,26 @@ export default {
       }
     }
   },
-  computed: {
-    submitDisabled: function () {
-      return this.$data.formValid !== true || this.$data.working
-    }
-  },
   template: `
   <div>
     <h1>Můj profil</h1>
     <form>
-      <vue-form-generator :schema="schema" :model="model"
-        :options="formOptions" @validated="onValidated">
-      </vue-form-generator>
+      <b-form-group
+        :state="!$v.interrests.$error"
+        label="Odebíraná témata"
+        label-for="budget-input"
+        invalid-feedback="je nutné si vybra"
+      >
+        <multiselect v-model="interrests" :options="options"
+          placeholder="vyberte si z menu"
+          :multiple="true">
+        </multiselect>
+      </b-form-group>
     </form>
 
-    <button type='submit' class='btn btn-primary' v-on:click='save()'
-      v-bind:class="{disabled: submitDisabled}" :disabled="submitDisabled">
-      <b>Uložit</b>
-    </button>
-    <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    <b-button class="mt-3 btn btn-primary" :disabled="$v.$anyError" @click="submit">
+      <b>Uložit</b> <i class="fas fa-spinner fa-spin" v-if="working"></i>
+    </b-button>
   </div>
   `
-}
+})
