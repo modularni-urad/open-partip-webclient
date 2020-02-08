@@ -8,46 +8,43 @@ Vue.use(VueToast, {
 export default {
   template: `
 <div>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  <b-navbar toggleable="lg" variant="dark" type="dark">
+    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <router-link class="nav-link" to="/">Domů</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/">Ankety</router-link>
-        </li>
-        <li class="nav-item">
+    <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-nav>
+        <b-nav-item>
+          <router-link class="nav-link" to="/"><i class="fas fa-home"></i> Domů</router-link>
+        </b-nav-item>
+        <b-nav-item>
           <router-link class="nav-link" to="/">Info Kanály</router-link>
-        </li>
-        <li class="nav-item">
+        </b-nav-item>
+        <b-nav-item>
           <router-link v-if="$store.state.user === null" class="nav-link" to="/register">
             Registrovat se
           </router-link>
           <router-link v-else class="nav-link" to="/profile">
             Můj profil
           </router-link>
-        </li>
-        <li class="nav-item">
+        </b-nav-item>
+        <b-nav-item>
           <router-link v-if="$store.state.user !== null" class="nav-link" to="/chreg">
             Změna registrace
           </router-link>
-        </li>
-      </ul>
-      <button v-if="$store.state.user !== null" class="btn btn-warning"
-        v-on:click="$store.commit('logout')">
-        Odhlásit
-      </button>
-      <router-link v-else class="btn btn-primary" to="/login">
-        Přihlásit
-      </router-link>
-    </div>
-  </nav>
+        </b-nav-item>
+      </b-navbar-nav>
+
+      <b-navbar-nav class="ml-auto">
+        <button v-if="$store.state.user !== null" class="btn btn-warning"
+          v-on:click="$store.commit('logout')">
+          <i class="fas fa-sign-out-alt"></i> Odhlásit
+        </button>
+        <router-link v-else class="btn btn-primary" to="/login">
+          Přihlásit
+        </router-link>
+      </b-navbar-nav>
+    </b-collapse>
+  </b-navbar>
 
   <div class="container-fluid mx-auto p-4">
     <!-- component matched by the route will render here -->

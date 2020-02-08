@@ -49,7 +49,9 @@ export default {
       <div class="col-sm-12 col-md-6">
           <router-link v-if="canChangeProject"
             :to="{name: 'paroapply', params: {call_id: call.id}}">
-            <button class="btn btn-primary">Vytvořit / upravit projekt</button>
+            <button class="btn btn-primary">
+              <i class="fas fa-edit"></i> Vytvořit / upravit projekt
+            </button>
           </router-link>
       </div>
     </div>

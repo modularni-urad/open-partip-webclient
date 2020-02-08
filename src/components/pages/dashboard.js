@@ -3,7 +3,7 @@
 export default {
   data: () => {
     return {
-      currentCall: null
+      calls: null
     }
   },
   created () {
@@ -12,17 +12,11 @@ export default {
   methods: {
     fetchData: async function () {
       const res = await axios.get(`${API}/paro_call/`)
-      this.$data.currentCall = res.data.length ? res.data[0] : null
+      this.$data.calls = res.data
     }
   },
   template: `
   <div>
-
-    <div class="row">
-      <div class="col-sm-12">
-        <h2>Rozcestník</h2>
-      </div>
-    </div>
 
     <div class="card-group">
 
@@ -31,16 +25,12 @@ export default {
         <div class="card-body">
           <h5 class="card-title">Participativní rozpočet</h5>
           <p class="card-text">
-            Some quick example text to build on the card title and
-            make up the bulk of the card's content.
+            <router-link v-for="c in calls" v-bind:key="c.id"
+              :to="{name: 'parocall', params: {call_id: c.id}}">
+              <h2 v-if="c.status === 'current'"><i class="fas fa-check"></i> {{c.name}} ...</h2>
+              <h4 v-else><i class="fas fa-history"></i> {{c.name}}</h4>
+            </router-link>
           </p>
-        </div>
-        <div class="card-footer">
-          <router-link v-if="currentCall"
-            :to="{name: 'parocall', params: {call_id: currentCall.id}}">
-            <button class="btn btn-primary">Přejít tam</button>
-          </router-link>
-          <p v-else class="info">Nyní není žádná výzva pro PaRO</p>
         </div>
       </div>
 
@@ -49,12 +39,10 @@ export default {
         <div class="card-body">
           <h5 class="card-title">Ankety</h5>
           <p class="card-text">
-            Some quick example text to build on the card title and
-            make up the bulk of the card's content.
+            Tuto sekci připravujeme.
+            Budou v ní k dispozici uživatelsky přívětivé akety na různá témata.
+            <h4>Stojíme o vaši zpětnou vazbu.</h4>
           </p>
-        </div>
-        <div class="card-footer">
-          Tuto sekci připravujeme.
         </div>
       </div>
 
@@ -63,12 +51,9 @@ export default {
         <div class="card-body">
           <h5 class="card-title">Info kanály</h5>
           <p class="card-text">
-            Some quick example text to build on the card title and
-            make up the bulk of the card's content.
+            Tuto sekci připravujeme.
+            Budou v ní k dispozici kategorizované informace.
           </p>
-        </div>
-        <div class="card-footer">
-          Tuto sekci připravujeme.
         </div>
       </div>
 
