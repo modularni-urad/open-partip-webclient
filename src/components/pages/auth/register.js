@@ -44,7 +44,11 @@ export default Vue.extend({
       try {
         let res = await axios.post(`${AUTH_API}/register`, this.$data)
         if (res.status === 200) {
-          res = await axios.post(`${AUTH_API}/login`, this.$data)
+          const cretentials = {
+            username: this.$data.phone,
+            password: this.$data.password
+          }
+          res = await axios.post(`${AUTH_API}/login`, cretentials)
           this.$router.push('')
         }
       } catch (e) {
@@ -163,9 +167,6 @@ export default Vue.extend({
 
       <div class="row">
         <div class="col">
-          <div>
-            Tady bude platny disclaimer, kompatibilni s GDPR
-          </div>
           <b-form-group
             :state="!$v.agree.$error"
             label-for="checkbox-agree"
@@ -176,7 +177,7 @@ export default Vue.extend({
               v-model="$v.agree.$model"
               :state="!$v.agree.$error"
             >
-              Souhlasím s podmínkami provozu
+              Souhlasím se <a href="/gdpr.html" target="_blank">zpracováním osobních údajů</a> pro účely komunikace prostřednictvím tohoto webu.
             </b-form-checkbox>
           </b-form-group>
         </div>
