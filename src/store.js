@@ -4,7 +4,7 @@ const KEY = '_opencomm_user_'
 const savedUser = localStorage.getItem(KEY)
 
 export default function (router) {
-  return new Vuex.Store({
+  const store = new Vuex.Store({
     state: {
       user: savedUser && JSON.parse(savedUser)
     },
@@ -26,4 +26,21 @@ export default function (router) {
       }
     }
   })
+
+  axios.interceptors.response.use(
+    function (response) { return response },
+    function (error) {
+      switch (error.response.status) {
+        case 401:
+          store.commit('logout')
+          return store.dispatch('toast', {
+            message: 'Přihlášení vypršelo',
+            type: 'success'
+          })
+        default:
+          return store.dispatch('toast', { message: error, type: 'error' })
+      }
+    })
+
+  return store
 }
