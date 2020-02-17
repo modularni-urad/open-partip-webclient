@@ -1,4 +1,5 @@
 /* global axios, API, _, moment */
+import ProjectStatus from './parts/projectstatus.js'
 
 export default {
   data: () => {
@@ -38,6 +39,9 @@ export default {
     canVote: function () {
       // TODO: check call
     }
+  },
+  components: {
+    projstatus: ProjectStatus
   },
   template: `
   <div v-if="!loading">
@@ -84,6 +88,7 @@ export default {
         <img v-if="p.photo" :src="p.photo" class="card-img-top projimg" alt="...">
         <div class="card-body">
           <h5 class="card-title">{{p.name}}</h5>
+          <projstatus project="p"></projstatus>
           <p class="card-text">{{p.desc}}</p>
           <p class="card-text">Rozpočet: {{p.total}}</p>
           <router-link :to="{name: 'parodetail', params: {id: p.id}}">
