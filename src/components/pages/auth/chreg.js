@@ -18,6 +18,10 @@ export default {
         const res = await axios.put(url)
         if (res.status === 200) {
           this.$data.message = 'Na novou adresu přijde potvrzovací mail'
+          this.$store.dispatch('toast', {
+            message: 'OK',
+            type: 'success'
+          })
         }
       } catch (e) {
         this.$data.message = e.response.data.message

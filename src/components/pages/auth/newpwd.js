@@ -41,6 +41,10 @@ export default Vue.extend({
         const res = await axios.post(`${AUTH_API}/change-password`, this.$data)
         if (res.status === 200) {
           this.$router.push('/login')
+          this.$store.dispatch('toast', {
+            message: 'Heslo změněno',
+            type: 'success'
+          })
         }
       } catch (e) {
         console.log(e)

@@ -49,7 +49,11 @@ export default Vue.extend({
             password: this.$data.password
           }
           res = await axios.post(`${AUTH_API}/login`, cretentials)
-          this.$router.push('')
+          this.$store.dispatch('toast', {
+            message: 'Registrováno',
+            type: 'success'
+          })
+          this.$router.push('/')
         }
       } catch (e) {
         console.log(e)
@@ -65,7 +69,7 @@ export default Vue.extend({
     sendValidationCode: async function () {
       try {
         const res = await axios.post(`${AUTH_API}/validationCode`, {
-          phone: Number(this.$data.phone)
+          phone: this.$data.phone
         })
         if (res.status === 200 && res.data.message === 'ok') {
           this.$data.validationNotSend = false
