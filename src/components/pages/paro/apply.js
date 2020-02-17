@@ -96,46 +96,11 @@ export default Vue.extend({
           >
             <b-form-input
               id="name-input"
-              placeholder="zadejte název projektu"
               v-model="$v.name.$model"
               :state="!$v.name.$error"
             ></b-form-input>
           </b-form-group>
 
-          <b-form-group
-            :state="!$v.desc.$error"
-            label="Stručný popis projektu"
-            label-for="desc-input"
-            invalid-feedback="Popis je povinný a musí být maximálně 128 znaků dlouhý"
-            description="Můžete používat markdown"
-          >
-            <b-form-textarea
-              id="desc-input"
-              placeholder="stručný popis projektu"
-              v-model="$v.desc.$model"
-              :state="!$v.desc.$error"
-              rows="4"
-            ></b-form-textarea>
-          </b-form-group>
-
-          <b-form-group
-            :state="!$v.content.$error"
-            label="Úplný popis projektu"
-            label-for="content-input"
-            invalid-feedback="Úplný popis je povinný"
-            description="Můžete používat markdown"
-          >
-            <b-form-textarea
-              id="content-input"
-              placeholder="Můžete používat markdown"
-              v-model="$v.content.$model"
-              :state="!$v.content.$error"
-              rows="10"
-            ></b-form-textarea>
-          </b-form-group>
-
-        </div>
-        <div class="col">
           <b-form-group
             :state="!$v.total.$error"
             label="Celkové náklady s DPH"
@@ -145,7 +110,6 @@ export default Vue.extend({
             <b-form-input
               id="total-input"
               type="number"
-              placeholder="zadejte číslo"
               v-model="$v.total.$model"
               :state="!$v.total.$error"
             ></b-form-input>
@@ -169,20 +133,67 @@ export default Vue.extend({
             ></b-form-input>
           </b-form-group>
 
+        </div>
+        <div class="col">
+
+          <b-form-group
+            :state="!$v.desc.$error"
+            label="Stručný popis projektu"
+            label-for="desc-input"
+            invalid-feedback="Popis je povinný a musí být maximálně 128 znaků dlouhý"
+            description="Můžete používat markdown"
+          >
+            <b-form-textarea
+              id="desc-input"
+              placeholder="stručný popis projektu"
+              v-model="$v.desc.$model"
+              :state="!$v.desc.$error"
+              rows="6"
+            ></b-form-textarea>
+            <template slot="description">
+              Můžete používat <a href="http://www.edgering.org/markdown/" target="_blank">markdown</a>
+            </template>
+          </b-form-group>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+
+          <b-form-group
+            :state="!$v.content.$error"
+            label="Úplný popis projektu, rozvedení stručného popisu do podrobnějších detailů"
+            label-for="content-input"
+            invalid-feedback="Úplný popis je povinný"
+          >
+            <b-form-textarea
+              id="content-input"
+              v-model="$v.content.$model"
+              :state="!$v.content.$error"
+              rows="8"
+            ></b-form-textarea>
+            <template slot="description">
+              Můžete používat <a href="http://www.edgering.org/markdown/" target="_blank">markdown</a>
+            </template>
+          </b-form-group>
+
           <b-form-group
             :state="!$v.budget.$error"
-            label="Rozpočet projektu"
+            label="Rozpočet projektu, opřený o nějakou referenci (eshop, konzultace se řemeslníkem)"
             label-for="budget-input"
             invalid-feedback="Rozpočet projektu je povinný a musí být maximílně 128 znaků dlouhý"
           >
             <b-form-textarea
               id="budget-input"
-              placeholder="Můžete používat markdown"
               v-model="$v.budget.$model"
               :state="!$v.budget.$error"
-              rows="10"
+              rows="8"
             ></b-form-textarea>
+            <template slot="description">
+              Můžete používat <a href="http://www.edgering.org/markdown/" target="_blank">markdown</a>
+            </template>
           </b-form-group>
+
         </div>
       </div>
     </form>
