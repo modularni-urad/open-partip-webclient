@@ -11,7 +11,7 @@ Or with docker:
 ```
 docker pull node:lts-alpine3.9
 docker run -w="/tmp" -v $PWD:/tmp --rm=true node:lts-alpine3.9 \
-  npm i --only=production --verbose && npm run build
+  /bin/sh -c "npm i --only=production --verbose && npm run build"
 ```
 
 ## how to debug
