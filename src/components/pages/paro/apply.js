@@ -201,6 +201,11 @@ export default Vue.extend({
     <b-button class="mt-3 btn btn-primary" :disabled="$v.$anyError" @click="submit">
       <b>Uložit</b> <i class="fas fa-spinner fa-spin" v-if="working"></i>
     </b-button>
+    <router-link :to="{name: 'parocall', params: {call_id: $router.currentRoute.params.call_id}}">
+      <b-button class="mt-3 btn btn-secondary">
+        Storno
+      </b-button>
+    </router-link>
   </div>
   `
 })
