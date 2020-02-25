@@ -38,7 +38,7 @@ export default function (router) {
             type: 'success'
           })
         default:
-          return store.dispatch('toast', { message: error, type: 'error' })
+          throw error
       }
     })
 
