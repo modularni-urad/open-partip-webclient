@@ -1,5 +1,6 @@
 /* global axios, API, _, moment */
 import ProjectStatus from './parts/projectstatus.js'
+import VoteButton from './parts/votebutton.js'
 
 export default {
   data: () => {
@@ -7,7 +8,7 @@ export default {
       loading: true,
       call: null,
       projects: [],
-      myvote: null
+      myvotes: null
     }
   },
   created () {
@@ -16,16 +17,18 @@ export default {
   methods: {
     fetchData: async function () {
       const callId = this.$router.currentRoute.params.call_id
-      const res = await Promise.all([
+      const promises = [
         axios.get(`${API}/paro_proj/?call_id=${callId}`),
         axios.get(`${API}/paro_call/?id=${callId}`)
-      ])
+      ]
+      this.$store.state.user &&
+        promises.push(axios.get(`${API}/paro_votes/${callId}`))
+      const res = await Promise.all(promises)
       this.$data.projects = res[0].data
       this.$data.call = res[1].data[0]
       this.$data.loading = false
       if (this.$store.state.user) {
-        const myVote = await axios.get(`${API}/paro_votes/${callId}`)
-        this.$data.myvote = _parseVote(myVote.data[0])
+        this.$data.myvotes = res[2].data
       }
     }
   },
@@ -37,11 +40,12 @@ export default {
         now <= moment(this.$data.call.thinking_start)
     },
     canVote: function () {
-      // TODO: check call
+      return this.$store.state.user && this.$data.call.status === 'voting'
     }
   },
   components: {
-    projstatus: ProjectStatus
+    projstatus: ProjectStatus,
+    votebutton: VoteButton
   },
   template: `
   <div v-if="!loading">
@@ -94,31 +98,11 @@ export default {
           <router-link :to="{name: 'parodetail', params: {id: p.id}}">
             <button class="btn btn-primary">Detail ...</button>
           </router-link>
-          <div v-if="canVote" class="btn-group" role="group">
-            <button type="button" class="btn btn-success">PRO</button>
-            <button type="button" class="btn btn-danger">PROTI</button>
-          </div>
+          <votebutton v-if="canVote" :call="call" :project="p" :votes="myvotes">
+          </votebutton>
         </div>
       </div>
     </div>
   </div>
   `
-}
-
-function _fillVote (arr, vote) {
-  _.each(arr, i => {
-    if (i[0] === '+') {
-      vote.pos.push(parseInt(i))
-    } else {
-      vote.neg.push(parseInt(i.substr(1)))
-    }
-  })
-}
-
-function _parseVote (content) {
-  const data = {
-    pos: [],
-    neg: []
-  }
-  return content ? _fillVote(content.split('|'), data) : data
 }
