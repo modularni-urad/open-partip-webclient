@@ -20,7 +20,7 @@ export default Vue.extend({
   validations: {
     name: {
       required: validators.required,
-      maxLength: validators.maxLength(32)
+      maxLength: validators.maxLength(64)
     },
     total: {
       required: validators.required
@@ -32,7 +32,7 @@ export default Vue.extend({
     },
     desc: {
       required: validators.required,
-      maxLength: validators.maxLength(128)
+      maxLength: validators.maxLength(512)
     },
     budget: {
       itemsrequired: function (value) {
