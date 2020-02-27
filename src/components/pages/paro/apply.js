@@ -103,7 +103,7 @@ export default Vue.extend({
             :state="!$v.name.$error"
             label="Název projektu"
             label-for="name-input"
-            invalid-feedback="Název je povinný a musí být maximálně 32 znaků dlouhý"
+            invalid-feedback="Název je povinný a musí být maximálně 64 znaků dlouhý"
           >
             <b-form-input
               id="name-input"
@@ -137,8 +137,7 @@ export default Vue.extend({
             :state="!$v.desc.$error"
             label="Stručný popis projektu"
             label-for="desc-input"
-            invalid-feedback="Popis je povinný a musí být maximálně 128 znaků dlouhý"
-            description="Můžete používat markdown"
+            invalid-feedback="Popis je povinný a musí být maximálně 512 znaků dlouhý"
           >
             <b-form-textarea
               id="desc-input"
@@ -147,9 +146,6 @@ export default Vue.extend({
               :state="!$v.desc.$error"
               rows="6"
             ></b-form-textarea>
-            <template slot="description">
-              Můžete používat <a href="http://www.edgering.org/markdown/" target="_blank">markdown</a>
-            </template>
           </b-form-group>
 
         </div>
