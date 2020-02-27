@@ -1,4 +1,6 @@
 /* global axios, API, Vue */
+import BudgetEditor from './parts/budgeteditor.js'
+
 const validationMixin = window.vuelidate.validationMixin
 const validators = window.validators
 
@@ -33,7 +35,14 @@ export default Vue.extend({
       maxLength: validators.maxLength(128)
     },
     budget: {
-      required: validators.required
+      itemsrequired: function (value) {
+        try {
+          const items = JSON.parse(value)
+          return items.length > 0
+        } catch (_) {
+          return false
+        }
+      }
     },
     content: {
       required: validators.required
@@ -81,6 +90,9 @@ export default Vue.extend({
         this.$data.working = false
       }
     }
+  },
+  components: {
+    budgeteditor: BudgetEditor
   },
   template: `
   <div>
@@ -183,14 +195,9 @@ export default Vue.extend({
             label-for="budget-input"
             invalid-feedback="Rozpočet projektu je povinný a musí být maximílně 128 znaků dlouhý"
           >
-            <b-form-textarea
-              id="budget-input"
-              v-model="$v.budget.$model"
-              :state="!$v.budget.$error"
-              rows="8"
-            ></b-form-textarea>
-            <template slot="description">
-              Můžete používat <a href="http://www.edgering.org/markdown/" target="_blank">markdown</a>
+            <budgeteditor v-model="$v.budget.$model"></budgeteditor>
+            <template slot="invalid-feedback">
+              Musíte zmínit jaké dílčí položky projekt vyžaduje.
             </template>
           </b-form-group>
 
