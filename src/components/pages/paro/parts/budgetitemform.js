@@ -61,9 +61,9 @@ export default Vue.extend({
 
       <b-form-group
         :state="!$v.count.$error"
-        label="Cena"
+        label="Počet (kusů, m3, atd)"
         label-for="count-input"
-        invalid-feedback="Název je povinný"
+        invalid-feedback="Počet je povinný"
       >
         <b-form-input
           id="name-input" type="number"
@@ -76,7 +76,7 @@ export default Vue.extend({
         :state="!$v.price.$error"
         label="Cena"
         label-for="price-input"
-        invalid-feedback="Název je povinný"
+        invalid-feedback="Cena je povinná"
       >
         <b-form-input
           id="name-input" type="number"
