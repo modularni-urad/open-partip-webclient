@@ -30,8 +30,8 @@ export default {
     }
   },
   computed: {
-    budgetHTML: function () {
-      return marked(this.project.budget)
+    budgetJSON: function () {
+      return JSON.parse(this.project.budget)
     },
     contentHTML: function () {
       return marked(this.project.content)
@@ -59,7 +59,22 @@ export default {
         <img v-if="project.photo" :src="project.photo" class="card-img-top" alt="ilustrační foto">
 
         <h3>Rozpočet</h3>
-        <p v-html="budgetHTML"></p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Název</th>
+              <th scope="col">Počet</th>
+              <th scope="col">Cena</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="i in budgetJSON">
+              <td>{{ i.name }} <a v-if="i.link" v-bind:href="i.link" target="_blank">(odkaz)</a></td>
+              <td>{{ i.count }}</td>
+              <td>{{ i.price }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
