@@ -1,5 +1,6 @@
 /* global axios, API, Vue */
 import BudgetEditor from './parts/budgeteditor.js'
+import { countTotal } from './parts/budgeteditor.js'
 
 const validationMixin = window.vuelidate.validationMixin
 const validators = window.validators
@@ -21,9 +22,6 @@ export default Vue.extend({
     name: {
       required: validators.required,
       maxLength: validators.maxLength(64)
-    },
-    total: {
-      required: validators.required
     },
     photo: {
       https: function (value) {
@@ -70,6 +68,7 @@ export default Vue.extend({
     },
     save: async function () {
       const model = this.$data
+      model.total = countTotal(model.budget)
       try {
         this.$data.working = true
         const callId = this.$router.currentRoute.params.call_id
@@ -110,20 +109,6 @@ export default Vue.extend({
               id="name-input"
               v-model="$v.name.$model"
               :state="!$v.name.$error"
-            ></b-form-input>
-          </b-form-group>
-
-          <b-form-group
-            :state="!$v.total.$error"
-            label="Celkové náklady s DPH"
-            label-for="total-input"
-            invalid-feedback="Toto je povinné"
-          >
-            <b-form-input
-              id="total-input"
-              type="number"
-              v-model="$v.total.$model"
-              :state="!$v.total.$error"
             ></b-form-input>
           </b-form-group>
 

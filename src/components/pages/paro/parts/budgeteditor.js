@@ -9,6 +9,13 @@ function _parse (data) {
   }
 }
 
+export function countTotal (budget) {
+  const items = _parse(budget)
+  return items.reduce((acc, i) => {
+    return acc + (i.count * i.price)
+  }, 0)
+}
+
 export default {
   methods: {
     remove: function (item) {
@@ -28,6 +35,9 @@ export default {
   computed: {
     items: function () {
       return _parse(this.$attrs.value)
+    },
+    total: function () {
+      return countTotal(this.$attrs.value)
     }
   },
   props: ['v-model'],
@@ -58,6 +68,7 @@ export default {
             </td>
           </tr>
         </tbody>
+        <h2>Celkové náklady s DPH: {{ total }}.</h2>
       </table>
     </div>
   `
