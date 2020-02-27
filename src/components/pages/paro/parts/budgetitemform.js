@@ -24,6 +24,9 @@ export default Vue.extend({
     },
     link: {}
   },
+  created () {
+    Object.assign(this.$data, this.$props.item)
+  },
   methods: {
     handleSubmit () {
       this.$v.$touch()
@@ -34,6 +37,7 @@ export default Vue.extend({
       this.$bvModal.hide('modal-add')
     }
   },
+  props: ['item'],
   template: `
     <form ref="form" @submit.stop.prevent="handleSubmit">
       <b-form-group

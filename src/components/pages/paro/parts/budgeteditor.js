@@ -17,6 +17,12 @@ export function countTotal (budget) {
 }
 
 export default {
+  data: function () {
+    return {
+      item: {},
+      curr: null
+    }
+  },
   methods: {
     remove: function (item) {
       const items = _parse(this.$attrs.value)
@@ -24,9 +30,20 @@ export default {
       items.splice(idx, 1)
       this.$emit('input', JSON.stringify(items))
     },
+    add: function () {
+      this.$data.curr = null
+      this.$bvModal.show('modal-add')
+    },
+    edit: function (idx, item) {
+      this.$data.curr = idx
+      Object.assign(this.$data.item, item)
+      this.$bvModal.show('modal-add')
+    },
     onItemSubmit: function (item) {
       const items = _parse(this.$attrs.value)
-      items.push(item)
+      this.$data.curr
+        ? Object.assign(items[this.$data.curr], item)
+        : items.push(item)
       const newVal = JSON.stringify(items)
       this.$props['v-model'] = newVal
       this.$emit('input', newVal)
@@ -45,7 +62,7 @@ export default {
   template: `
     <div>
       <b-modal id="modal-add" title="Přidat položku" hide-footer>
-        <itemform v-bind:onSubmit="onItemSubmit"></itemform>
+        <itemform v-bind:onSubmit="onItemSubmit" v-bind:item="item"></itemform>
       </b-modal>
       <table class="table table-striped">
         <thead>
@@ -53,17 +70,18 @@ export default {
             <th scope="col">Název</th>
             <th scope="col">Počet</th>
             <th scope="col">Cena</th>
-            <th><b-button variant="primary" size="sm" v-b-modal.modal-add>
+            <th><b-button variant="primary" size="sm" @click="add">
               + přidat
             </b-button></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="i in items">
+          <tr v-for="(i, idx) in items">
             <td>{{ i.name }} <a v-if="i.link" v-bind:href="i.link" target="_blank">(odkaz)</a></td>
             <td>{{ i.count }}</td>
             <td>{{ i.price }}</td>
             <td>
+              <b-button variant="secondary" size="sm" @click='edit(idx, i)'>edit</b-button>
               <b-button variant="danger" size="sm" @click='remove(i)'>x odstranit</b-button>
             </td>
           </tr>
