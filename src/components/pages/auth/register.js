@@ -1,4 +1,4 @@
-/* global axios, AUTH_API, Vue */
+/* global axios, AUTH_API, API, Vue */
 const validationMixin = window.vuelidate.validationMixin
 const validators = window.validators
 
@@ -44,14 +44,26 @@ export default Vue.extend({
       try {
         let res = await axios.post(`${AUTH_API}/register`, this.$data)
         if (res.status === 200) {
+          this.$store.dispatch('toast', {
+            message: 'Registrováno',
+            type: 'success',
+            duration: 10000
+          })
           const cretentials = {
             username: this.$data.phone,
             password: this.$data.password
           }
           res = await axios.post(`${AUTH_API}/login`, cretentials)
+          await axios.post(`${API}/login`, null, {
+            headers: {
+              Authorization: `JWT ${res.data.token}`
+            }
+          })
+          this.$store.commit('login', res.data.user)
           this.$store.dispatch('toast', {
-            message: 'Registrováno',
-            type: 'success'
+            message: 'A rovnou přihlášeno :)',
+            type: 'success',
+            duration: 5000
           })
           this.$router.push('/')
         }
