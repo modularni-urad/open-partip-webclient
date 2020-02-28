@@ -1,10 +1,11 @@
 package-lock.json
 npm-debug.log
 node_modules/
-./index.html
+index.html
 *.min.jss
 vars.env
 .*
 js/main.js
 *.sh
 *.sqlite
+dist/bundle.js
