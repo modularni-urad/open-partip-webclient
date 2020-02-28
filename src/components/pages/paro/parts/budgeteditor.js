@@ -41,9 +41,9 @@ export default {
     },
     onItemSubmit: function (item) {
       const items = _parse(this.$attrs.value)
-      this.$data.curr
-        ? Object.assign(items[this.$data.curr], item)
-        : items.push(item)
+      this.$data.curr === null
+        ? items.push(item)
+        : Object.assign(items[this.$data.curr], item)
       const newVal = JSON.stringify(items)
       this.$props['v-model'] = newVal
       this.$emit('input', newVal)
