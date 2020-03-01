@@ -1,4 +1,4 @@
-/* global axios, API, marked, moment */
+/* global axios, API, marked */
 import LikeButton from './parts/likebutton.js'
 import ProjectStatus from './parts/projectstatus.js'
 
@@ -14,6 +14,16 @@ export default {
   components: {
     likebutton: LikeButton,
     projstatus: ProjectStatus
+  },
+  metaInfo: function () {
+    return this.$data.project ? {
+      title: this.$data.project.name,
+      meta: [
+        { property: 'og:title', content: this.$data.project.name },
+        { property: 'og:image', content: this.$data.project.photo || '' },
+        { property: 'og:description', content: this.$data.project.desc }
+      ]
+    } : {}
   },
   created () {
     this.fetchData()
