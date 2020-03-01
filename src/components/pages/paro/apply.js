@@ -82,6 +82,7 @@ export default Vue.extend({
           message: 'Uloženo',
           type: 'success'
         })
+        this.$router.push(`/paro/${callId}`)
       } catch (e) {
         this.$store.dispatch('toast', { message: e, type: 'error' })
         console.log(e)
