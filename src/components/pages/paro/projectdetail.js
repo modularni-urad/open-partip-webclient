@@ -57,7 +57,7 @@ export default {
           <h4>Zpět na: Výzva: {{call.name}}</h4>
         </router-link>
 
-        <projstatus project="project"></projstatus>
+        <projstatus v-bind:project="project"></projstatus>
 
         <h4>{{project.desc}}</h4>
 
