@@ -30,7 +30,7 @@ export default Vue.extend({
     },
     desc: {
       required: validators.required,
-      maxLength: validators.maxLength(512)
+      maxLength: validators.maxLength(255)
     },
     budget: {
       itemsrequired: function (value) {
@@ -138,7 +138,7 @@ export default Vue.extend({
             :state="!$v.desc.$error"
             label="Stručný popis projektu"
             label-for="desc-input"
-            invalid-feedback="Popis je povinný a musí být maximálně 512 znaků dlouhý"
+            invalid-feedback="Popis je povinný a musí být maximálně 255 znaků dlouhý"
           >
             <b-form-textarea
               id="desc-input"
