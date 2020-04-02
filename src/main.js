@@ -25,7 +25,7 @@ const router = new VueRouter({
     { path: '/paro/:call_id', component: ParoProjectList, name: 'parocall' },
     { path: '/paro/:call_id/apply', component: ParoApply, name: 'paroapply' },
     { path: '/paro/project/:id', component: ParoProjDetail, name: 'parodetail' },
-    { path: '', component: Dashboard }
+    { path: '', name: 'home', component: Dashboard }
   ]
 })
 

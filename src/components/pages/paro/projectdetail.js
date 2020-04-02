@@ -45,30 +45,35 @@ export default {
     },
     contentHTML: function () {
       return marked(this.project.content)
+    },
+    items: function () {
+      return [
+        { text: 'Domů', to: { name: 'home' } },
+        {
+          text: this.$data.call.name,
+          to: { name: 'parocall', params: { call_id: this.$data.call.id } }
+        },
+        { text: this.$data.project.name, active: true }
+      ]
     }
   },
   template: `
   <div v-if="!loading">
+    <b-breadcrumb :items="items"></b-breadcrumb>
     <div class="row">
       <div class="col-sm-12 col-md-6">
         <h2>{{project.name}}</h2>
 
-        <router-link :to="{name: 'parocall', params: {call_id: call.id}}">
-          <h4>Zpět na: Výzva: {{call.name}}</h4>
-        </router-link>
-
-        <projstatus v-bind:project="project"></projstatus>
-
-        <h4>{{project.desc}}</h4>
-
-        <p v-html="contentHTML"></p>
-
-        <p>Celkem: {{project.total}}</p>
-      </div>
-      <div class="col-sm-12 col-md-6">
         <img v-if="project.photo" :src="project.photo" class="card-img-top" alt="ilustrační foto">
 
+        <h4>{{project.desc}}</h4>
+      </div>
+
+      <div class="col-sm-12 col-md-6">
+        <projstatus v-bind:project="project"></projstatus>
+        
         <h3>Rozpočet</h3>
+        <p>Celkem: {{project.total}}</p>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -90,7 +95,9 @@ export default {
 
     <div class="row">
       <div class="col-sm-12">
-        "Líbí se mi" od {{project.support_count}} uživatelů.
+        <p v-html="contentHTML"></p>
+
+        <p>"Líbí se mi" od {{project.support_count}} uživatelů.</p>
       </div>
       <likebutton v-bind:call="call" v-bind:project="project"></likebutton>
     </div>
