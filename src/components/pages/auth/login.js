@@ -1,4 +1,4 @@
-/* global axios, API, AUTH_API */
+/* global axios, API */
 
 export default {
   data: () => {
@@ -17,8 +17,8 @@ export default {
       try {
         this.$data.error = null
         this.$data.working = true
-        const res = await axios.post(`${AUTH_API}/login`, this.$data.record)
-        await axios.post(`${API}/login`, null, {
+        const res = await axios.post(`${API}/ooth/local/login`, this.$data.record)
+        await axios.post(`${API}/auth/jwt/login`, null, {
           headers: {
             Authorization: `JWT ${res.data.token}`
           }

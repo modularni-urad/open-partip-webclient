@@ -10,7 +10,7 @@ export default function (router) {
     },
     mutations: {
       logout: async state => {
-        await axios.post(`${API}/logout`)
+        await axios.post(`${API}/auth/logout`)
         state.user = null
         localStorage.removeItem(KEY)
         router.push('/')

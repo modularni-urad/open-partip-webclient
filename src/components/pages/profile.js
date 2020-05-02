@@ -39,8 +39,8 @@ export default Vue.extend({
         this.$data.working = true
         const data = { interrests: this.$data.interrests.join(',') }
         const req = this.$data.uid
-          ? axios.put(`${API}/comm_prefs/${this.$data.uid}/`, data)
-          : axios.post(`${API}/comm_prefs/`, _.extend(data, { uid: this.$data.uid }))
+          ? axios.put(`${API}/infostreams/${this.$data.uid}/`, data)
+          : axios.post(`${API}/infostreams/`, _.extend(data, { uid: this.$data.uid }))
         await req
         this.$data.working = false
         this.$store.dispatch('toast', {

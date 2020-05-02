@@ -1,4 +1,4 @@
-/* global axios, AUTH_API */
+/* global axios, API */
 
 export default {
   data: () => {
@@ -14,7 +14,7 @@ export default {
     save: async function () {
       try {
         const uid = this.$store.state.user._id
-        const url = `${AUTH_API}/set-email?uid=${uid}&email=${this.$data.model.email}`
+        const url = `${API}/ooth/local/set-email?uid=${uid}&email=${this.$data.model.email}`
         const res = await axios.put(url)
         if (res.status === 200) {
           this.$data.message = 'Na novou adresu přijde potvrzovací mail'

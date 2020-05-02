@@ -1,6 +1,11 @@
-/* global axios, AUTH_API, API, Vue */
+/* global axios, API, Vue */
 const validationMixin = window.vuelidate.validationMixin
 const validators = window.validators
+
+const messageMapping = {
+  'register.invalid_validation_code': 'Špatný kód z SMS',
+  'register.phone_already_registered': 'Toto tel. číslo je už registrováno'
+}
 
 export default Vue.extend({
   mixins: [validationMixin],
@@ -42,7 +47,7 @@ export default Vue.extend({
   methods: {
     register: async function () {
       try {
-        let res = await axios.post(`${AUTH_API}/register`, this.$data)
+        let res = await axios.post(`${API}/ooth/local/register`, this.$data)
         if (res.status === 200) {
           this.$store.dispatch('toast', {
             message: 'Registrováno',
@@ -53,12 +58,12 @@ export default Vue.extend({
             username: this.$data.phone,
             password: this.$data.password
           }
-          res = await axios.post(`${AUTH_API}/login`, cretentials)
-          await axios.post(`${API}/login`, null, {
-            headers: {
-              Authorization: `JWT ${res.data.token}`
-            }
-          })
+          res = await axios.post(`${API}/ooth/local/login`, cretentials)
+          // await axios.post(`${API}/login`, null, {
+          //   headers: {
+          //     Authorization: `JWT ${res.data.token}`
+          //   }
+          // })
           this.$store.commit('login', res.data.user)
           this.$store.dispatch('toast', {
             message: 'A rovnou přihlášeno :)',
@@ -68,7 +73,8 @@ export default Vue.extend({
           this.$router.push('/')
         }
       } catch (e) {
-        console.log(e)
+        const message = messageMapping[e.response.data.message]
+        this.$store.dispatch('toast', { message, type: 'error' })
       }
     },
     submit: function () {
@@ -80,14 +86,15 @@ export default Vue.extend({
     },
     sendValidationCode: async function () {
       try {
-        const res = await axios.post(`${AUTH_API}/validationCode`, {
+        const res = await axios.post(`${API}/ooth/local/validationcode`, {
           phone: this.$data.phone
         })
         if (res.status === 200 && res.data.message === 'ok') {
           this.$data.validationNotSend = false
         }
       } catch (e) {
-        console.log(e)
+        const message = `Nepodařilo se odeslat SMS: ${e.toString()}`
+        this.$store.dispatch('toast', { message, type: 'error' })
       }
     }
   },

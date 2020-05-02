@@ -1,4 +1,4 @@
-/* global axios, Vue, AUTH_API */
+/* global axios, Vue, API */
 const validationMixin = window.vuelidate.validationMixin
 const validators = window.validators
 
@@ -38,7 +38,7 @@ export default Vue.extend({
     },
     send: async function () {
       try {
-        const res = await axios.post(`${AUTH_API}/change-password`, this.$data)
+        const res = await axios.post(`${API}/ooth/local/change-password`, this.$data)
         if (res.status === 200) {
           this.$router.push('/login')
           this.$store.dispatch('toast', {
@@ -47,19 +47,21 @@ export default Vue.extend({
           })
         }
       } catch (e) {
-        console.log(e)
+        const message = `Nepodařilo se: ${e.toString()}`
+        this.$store.dispatch('toast', { message, type: 'error' })
       }
     },
     sendValidationCode: async function () {
       try {
-        const res = await axios.post(`${AUTH_API}/validationcode`, {
+        const res = await axios.post(`${API}/ooth/local/validationcode`, {
           phone: Number(this.$data.phone)
         })
         if (res.status === 200 && res.data.message === 'ok') {
           this.$data.validationNotSend = false
         }
       } catch (e) {
-        console.log(e)
+        const message = `Nepodařilo se odeslat SMS: ${e.toString()}`
+        this.$store.dispatch('toast', { message, type: 'error' })
       }
     }
   },

@@ -11,7 +11,7 @@ export default {
   },
   methods: {
     fetchData: async function () {
-      const res = await axios.get(`${API}/paro_call/`)
+      const res = await axios.get(`${API}/paro/call/`)
       this.$data.calls = res.data
     }
   },

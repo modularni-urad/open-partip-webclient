@@ -18,11 +18,11 @@ export default {
     fetchData: async function () {
       const callId = this.$router.currentRoute.params.call_id
       const promises = [
-        axios.get(`${API}/paro_proj/?call_id=${callId}`),
-        axios.get(`${API}/paro_call/?id=${callId}`)
+        axios.get(`${API}/paro/project/?call_id=${callId}`),
+        axios.get(`${API}/paro/call/?id=${callId}`)
       ]
       this.$store.state.user &&
-        promises.push(axios.get(`${API}/paro_votes/${callId}`))
+        promises.push(axios.get(`${API}/paro/votes/${callId}`))
       const res = await Promise.all(promises)
       this.$data.projects = res[0].data
       this.$data.call = res[1].data[0]
