@@ -31,10 +31,10 @@ export default {
   methods: {
     fetchData: async function () {
       const projId = this.$router.currentRoute.params.id
-      let res = await axios.get(`${API}/paro_proj/?id=${projId}`)
+      let res = await axios.get(`${API}/paro/project/?id=${projId}`)
       const p = res.data.length ? res.data[0] : null
       this.$data.project = p
-      res = await axios.get(`${API}/paro_call/?id=${p.call_id}`)
+      res = await axios.get(`${API}/paro/call/?id=${p.call_id}`)
       this.$data.call = res.data[0]
       this.$data.loading = false
     }
@@ -71,7 +71,7 @@ export default {
 
       <div class="col-sm-12 col-md-6">
         <projstatus v-bind:project="project"></projstatus>
-        
+
         <h3>Rozpočet</h3>
         <p>Celkem: {{project.total}}</p>
         <table class="table table-striped">
