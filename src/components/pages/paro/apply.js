@@ -54,7 +54,7 @@ export default Vue.extend({
       this.$data.working = true
       const callId = this.$router.currentRoute.params.call_id
       const author = this.$store.state.user._id
-      const url = `${API}/paro_proj/?call_id=${callId}&author=${author}`
+      const url = `${API}/paro/project/?call_id=${callId}&author=${author}`
       const res = await axios.get(url)
       if (res.data.length > 0) Object.assign(this.$data, res.data[0])
       this.$data.working = false
@@ -73,9 +73,9 @@ export default Vue.extend({
         this.$data.working = true
         const callId = this.$router.currentRoute.params.call_id
         if (model.id) {
-          await axios.put(`${API}/paro_proj/${model.id}`, model)
+          await axios.put(`${API}/paro/project/${model.id}`, model)
         } else {
-          const res = await axios.post(`${API}/paro_proj/${callId}`, model)
+          const res = await axios.post(`${API}/paro/project/${callId}`, model)
           model.id = res.data[0]
         }
         this.$store.dispatch('toast', {
