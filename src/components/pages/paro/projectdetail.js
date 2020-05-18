@@ -1,4 +1,5 @@
 /* global axios, API, marked */
+import { MDImageSrcs2CDN } from './utils.js'
 import LikeButton from './parts/likebutton.js'
 import ProjectStatus from './parts/projectstatus.js'
 
@@ -33,6 +34,7 @@ export default {
       const projId = this.$router.currentRoute.params.id
       let res = await axios.get(`${API}/paro/project/?id=${projId}`)
       const p = res.data.length ? res.data[0] : null
+      if (p) p.content = MDImageSrcs2CDN(p.content)
       this.$data.project = p
       res = await axios.get(`${API}/paro/call/?id=${p.call_id}`)
       this.$data.call = res.data[0]
@@ -64,7 +66,7 @@ export default {
       <div class="col-sm-12 col-md-6">
         <h2>{{project.name}}</h2>
 
-        <img v-if="project.photo" :src="project.photo" class="card-img-top" alt="ilustrační foto">
+        <img v-if="project.photo" :src="project.photo | cdn" class="card-img-top" alt="ilustrační foto">
 
         <h4>{{project.desc}}</h4>
       </div>
