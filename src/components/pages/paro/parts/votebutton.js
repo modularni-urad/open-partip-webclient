@@ -4,18 +4,18 @@ export default {
   methods: {
     sayYes: async function () {
       const data = { value: 1 }
-      await axios.post(`${API}/paro_votes/${this.call.id}/${this.project.id}`, data)
+      await axios.post(`${API}/paro/votes/${this.call.id}/${this.project.id}`, data)
       Object.assign(data, { proj_id: this.project.id, call_id: this.call.id })
       this.$props.votes.push(data)
     },
     sayNo: async function () {
       const data = { value: 1 }
-      await axios.post(`${API}/paro_votes/${this.call.id}/${this.project.id}`, data)
+      await axios.post(`${API}/paro/votes/${this.call.id}/${this.project.id}`, data)
       Object.assign(data, { proj_id: this.project.id, call_id: this.call.id })
       this.$props.votes.push(data)
     },
     remove: async function () {
-      await axios.delete(`${API}/paro_votes/${this.call.id}/${this.project.id}`)
+      await axios.delete(`${API}/paro/votes/${this.call.id}/${this.project.id}`)
       const idx = _.findIndex(this.$props.votes, { proj_id: this.project.id })
       this.$props.votes.splice(idx, 1)
     }

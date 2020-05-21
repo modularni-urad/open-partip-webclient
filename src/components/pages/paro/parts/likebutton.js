@@ -13,18 +13,18 @@ export default {
     fetchData: async function () {
       const projId = this.$router.currentRoute.params.id
       if (this.$store.state.user) {
-        const res = await axios.get(`${API}/paro_support/${projId}`)
+        const res = await axios.get(`${API}/paro/support/${projId}`)
         this.$data.support = res && res.data.length > 0
       }
     },
     sendSupport: async function () {
       const projId = this.$router.currentRoute.params.id
       if (this.$data.support) {
-        await axios.delete(`${API}/paro_support/${projId}`)
+        await axios.delete(`${API}/paro/support/${projId}`)
         this.$data.support = false
         this.$props.project.support_count--
       } else {
-        const res = await axios.post(`${API}/paro_support/${projId}`)
+        const res = await axios.post(`${API}/paro/support/${projId}`)
         this.$data.support = true
         this.$props.project.support_count++
         this.$props.project.state = res.data
