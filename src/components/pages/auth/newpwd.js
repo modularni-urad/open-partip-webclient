@@ -139,7 +139,7 @@ export default Vue.extend({
             <span v-if="validationSend">Znovu </span>Zaslat ověřovací kod
           </b-button>
           <span v-if="validationSend">
-            Potvrzovací kod zaslán SMS na {{model.phone}}.
+            Potvrzovací kod zaslán SMS na {{phone}}.
           </span>
         </div>
       </div>
