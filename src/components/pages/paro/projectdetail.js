@@ -2,6 +2,7 @@
 import { MDImageSrcs2CDN } from './utils.js'
 import LikeButton from './parts/likebutton.js'
 import ProjectStatus from './parts/projectstatus.js'
+import UserInfo from './parts/userinfo.js'
 
 export default {
   data: () => {
@@ -9,12 +10,14 @@ export default {
       loading: true,
       call: null,
       project: null,
-      support: null
+      support: null,
+      feedbacks: null
     }
   },
   components: {
     likebutton: LikeButton,
-    projstatus: ProjectStatus
+    projstatus: ProjectStatus,
+    userinfo: UserInfo
   },
   metaInfo: function () {
     return this.$data.project ? {
@@ -38,6 +41,8 @@ export default {
       this.$data.project = p
       res = await axios.get(`${API}/paro/call/?id=${p.call_id}`)
       this.$data.call = res.data[0]
+      res = await axios.get(`${API}/paro/feedback/${projId}`)
+      this.$data.feedbacks = res.data
       this.$data.loading = false
     }
   },
@@ -102,6 +107,19 @@ export default {
         <p>"Líbí se mi" od {{project.support_count}} uživatelů.</p>
       </div>
       <likebutton v-bind:call="call" v-bind:project="project"></likebutton>
+    </div>
+
+    <div v-if="feedbacks.length > 0" class="row">
+      <div class="col-sm-12">
+        <h3>Posouzení proveditelnosti</h3>
+        <ul>
+          <li v-for="i in feedbacks">
+            <userinfo :feedback="i"></userinfo>:
+            <i v-if="i.status==='resolved'" class="text-success fas fa-thumbs-up"></i>
+            <i v-else class="text-danger fas fa-thumbs-down"></i>: {{ i.message }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
   `
