@@ -7,7 +7,8 @@ export default Vue.extend({
   data: () => {
     return {
       working: false,
-      validationNotSend: true,
+      validationSend: false,
+      sendingValidation: false,
       phone: '',
       password: '',
       validcode: ''
@@ -47,22 +48,36 @@ export default Vue.extend({
           })
         }
       } catch (e) {
-        const message = `Nepodařilo se: ${e.toString()}`
+        let message = `Nepodařilo se: ${e.toString()}`
+        try {
+          if (e.response.data.message === 'register.invalid_validation_code') {
+            message = 'Neplatný ověřovací kod, zašlete si jej znovu'
+          }
+        } catch (_) {}
         this.$store.dispatch('toast', { message, type: 'error' })
       }
     },
     sendValidationCode: async function () {
+      this.$data.sendingValidation = true
       try {
         const res = await axios.post(`${API}/ooth/local/validationcode`, {
           phone: Number(this.$data.phone)
         })
         if (res.status === 200 && res.data.message === 'ok') {
-          this.$data.validationNotSend = false
+          this.$data.validationSend = true
         }
       } catch (e) {
         const message = `Nepodařilo se odeslat SMS: ${e.toString()}`
         this.$store.dispatch('toast', { message, type: 'error' })
+      } finally {
+        this.$data.sendingValidation = false
       }
+    }
+  },
+  computed: {
+    sendValidationCodeButtDisabled: function () {
+      return this.$data.sendingValidation ||
+        this.$v.phone.$error || !this.$v.phone.$dirty
     }
   },
   template: `
@@ -87,7 +102,7 @@ export default Vue.extend({
 
       <b-form-group
         :state="!$v.password.$error"
-        label="Nové heslo"
+        label="Nové heslo (Minimalně 8 znaků, malá i velká písmena a číslice)"
         label-for="password-input"
         invalid-feedback="Heslo neodpovídá požadavkům"
       >
@@ -118,11 +133,12 @@ export default Vue.extend({
           </b-form-group>
         </div>
         <div class="col">
-          <b-button v-if="validationNotSend" class='btn btn-secondary'
-            @click='sendValidationCode'>
-            Zaslat ověřovací kod
+          <b-button class='btn btn-secondary'
+            @click='sendValidationCode'
+            :disabled="sendValidationCodeButtDisabled">
+            <span v-if="validationSend">Znovu </span>Zaslat ověřovací kod
           </b-button>
-          <span v-else>
+          <span v-if="validationSend">
             Potvrzovací kod zaslán SMS na {{model.phone}}.
           </span>
         </div>
