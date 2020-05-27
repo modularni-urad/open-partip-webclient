@@ -24,8 +24,10 @@ export default Vue.extend({
       maxLength: validators.maxLength(64)
     },
     photo: {
-      https: function (value) {
-        return (value && Boolean(value.match(/^https:\/\/+/))) || !value
+      isImage (value) {
+        return axios(value).then(res => {
+          return res.headers['content-type'].indexOf('image') >= 0
+        }).catch(_ => false)
       }
     },
     desc: {
@@ -117,7 +119,7 @@ export default Vue.extend({
             :state="!$v.photo.$error"
             label="Obrázek projektu"
             label-for="photo-input"
-            invalid-feedback="adresa obrázku musí začínat https"
+            invalid-feedback="adresa musí odkazovat na obrázek"
           >
             <template slot="description">
               Nahrát můžete např. přes <a href="https://1iq.cz/" target="_blank">1iq.cz</a>
