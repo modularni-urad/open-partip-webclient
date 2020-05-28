@@ -1,4 +1,4 @@
-/* global axios, API, Vue */
+/* global axios, API, Vue, fetch */
 import BudgetEditor from './parts/budgeteditor.js'
 import { countTotal } from './parts/budgeteditor.js'
 
@@ -25,9 +25,14 @@ export default Vue.extend({
     },
     photo: {
       isImage (value) {
-        return axios(value).then(res => {
-          return res.headers['content-type'].indexOf('image') >= 0
-        }).catch(_ => false)
+        return fetch(value, { mode: 'no-cors', credentials: 'omit' })
+          .then(res => {
+            return res.headers['content-type'].indexOf('image') >= 0
+          })
+          .catch(err => {
+            console.log(err)
+            return false
+          })
       }
     },
     desc: {
