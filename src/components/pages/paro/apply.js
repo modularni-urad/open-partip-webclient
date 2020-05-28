@@ -23,13 +23,16 @@ export default Vue.extend({
       required: validators.required,
       maxLength: validators.maxLength(64)
     },
-    // photo: {
+    photo: {
+      https (value) {
+        return (value && Boolean(value.match(/^https:\/\/+/))) || !value
+      }
     //   isImage (value) {
     //     return axios(`/cdn/isimage?url=${value}`).then(res => {
     //       return res.data
     //     }).catch(_ => false)
     //   }
-    // },
+    },
     desc: {
       required: validators.required,
       maxLength: validators.maxLength(255)
