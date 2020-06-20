@@ -15,6 +15,8 @@ import ParoApply from './components/pages/paro/apply.js'
 import ParoProjectList from './components/pages/paro/projectlist.js'
 import ParoProjDetail from './components/pages/paro/projectdetail.js'
 
+import AnketaDetail from './components/pages/ankety/detail.js'
+
 const router = new VueRouter({
   routes: [
     { path: '/register', component: Register },
@@ -25,6 +27,7 @@ const router = new VueRouter({
     { path: '/paro/:call_id', component: ParoProjectList, name: 'parocall' },
     { path: '/paro/:call_id/apply', component: ParoApply, name: 'paroapply' },
     { path: '/paro/project/:id', component: ParoProjDetail, name: 'parodetail' },
+    { path: '/ankety/:id', component: AnketaDetail, name: 'anketadetail' },
     { path: '', name: 'home', component: Dashboard }
   ]
 })

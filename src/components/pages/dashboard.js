@@ -3,7 +3,8 @@
 export default {
   data: () => {
     return {
-      calls: null
+      calls: null,
+      ankety: null
     }
   },
   created () {
@@ -13,6 +14,8 @@ export default {
     fetchData: async function () {
       const res = await axios.get(`${API}/paro/call/`)
       this.$data.calls = res.data
+      const ares = await axios.get(`${API}/ankety/surveys/`)
+      this.$data.ankety = ares.data
     }
   },
   template: `
@@ -39,9 +42,11 @@ export default {
         <div class="card-body">
           <h5 class="card-title">Ankety</h5>
           <p class="card-text">
-            Tuto sekci připravujeme.
-            Budou v ní k dispozici uživatelsky přívětivé akety na různá témata.
-            <h4>Stojíme o vaši zpětnou vazbu.</h4>
+            <router-link v-for="a in ankety" v-bind:key="a.id"
+              :to="{name: 'anketadetail', params: {id: a.id}}">
+              <h2>{{a.name}}</h2>
+              <p>{{a.desc}}</p>
+            </router-link>
           </p>
         </div>
       </div>
