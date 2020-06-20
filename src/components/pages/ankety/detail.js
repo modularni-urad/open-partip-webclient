@@ -1,7 +1,5 @@
 /* global axios, API, marked */
-import { MDImageSrcs2CDN } from './utils.js'
 import VoteButton from './parts/votebutton.js'
-import UserInfo from './parts/userinfo.js'
 
 export default {
   data: () => {
@@ -13,7 +11,6 @@ export default {
     }
   },
   components: {
-    userinfo: UserInfo,
     votebutton: VoteButton
   },
   metaInfo: function () {
@@ -69,7 +66,7 @@ export default {
         <h4>{{survey.desc}}</h4>
 
         <p>
-          Hlasování probáhá:
+          Hlasování probíhá:
           {{survey.voting_start | formatDate}} -
           {{survey.voting_end | formatDate}}.
         </p>

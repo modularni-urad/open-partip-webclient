@@ -45,6 +45,7 @@ export default {
             <router-link v-for="a in ankety" v-bind:key="a.id"
               :to="{name: 'anketadetail', params: {id: a.id}}">
               <h2>{{a.name}}</h2>
+              <p>{{a.voting_start | formatDate}} - {{a.voting_end | formatDate}}</p>
               <p>{{a.desc}}</p>
             </router-link>
           </p>
