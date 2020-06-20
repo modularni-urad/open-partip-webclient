@@ -1,6 +1,5 @@
-/* global axios, API, _, moment */
+/* global axios, API, moment */
 import ProjectStatus from './parts/projectstatus.js'
-import VoteButton from './parts/votebutton.js'
 
 export default {
   data: () => {
@@ -21,15 +20,10 @@ export default {
         axios.get(`${API}/paro/project/?call_id=${callId}`),
         axios.get(`${API}/paro/call/?id=${callId}`)
       ]
-      this.$store.state.user &&
-        promises.push(axios.get(`${API}/paro/votes/${callId}`))
       const res = await Promise.all(promises)
       this.$data.projects = res[0].data
       this.$data.call = res[1].data[0]
       this.$data.loading = false
-      if (this.$store.state.user) {
-        this.$data.myvotes = res[2].data
-      }
     }
   },
   computed: {
@@ -44,8 +38,7 @@ export default {
     }
   },
   components: {
-    projstatus: ProjectStatus,
-    votebutton: VoteButton
+    projstatus: ProjectStatus
   },
   template: `
   <div v-if="!loading">
@@ -98,8 +91,6 @@ export default {
           <router-link :to="{name: 'parodetail', params: {id: p.id}}">
             <button class="btn btn-primary">Detail ...</button>
           </router-link>
-          <votebutton v-if="canVote" :call="call" :project="p" :votes="myvotes">
-          </votebutton>
         </div>
       </div>
     </div>
