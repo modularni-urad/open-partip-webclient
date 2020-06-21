@@ -42,7 +42,10 @@ export default {
         <div class="card-body">
           <h5 class="card-title">Ankety</h5>
           <p class="card-text">
-            <router-link v-for="a in ankety" v-bind:key="a.id"
+            <p v-if="ankety.length === 0">
+              Žádná aktuální anketa.
+            </p>
+            <router-link v-else v-for="a in ankety" v-bind:key="a.id"
               :to="{name: 'anketadetail', params: {id: a.id}}">
               <h2>{{a.name}}</h2>
               <p>{{a.voting_start | formatDate}} - {{a.voting_end | formatDate}}</p>
