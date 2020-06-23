@@ -18,7 +18,7 @@ export default {
       title: this.$data.survey.name,
       meta: [
         { property: 'og:title', content: this.$data.survey.name },
-        { property: 'og:image', content: this.$data.survey.photo || '' },
+        { property: 'og:image', content: this.$data.survey.image || '' },
         { property: 'og:description', content: this.$data.survey.desc }
       ]
     } : {}
@@ -33,7 +33,7 @@ export default {
       this.$data.survey = res.data.length ? res.data[0] : null
       res = await axios.get(`${API}/ankety/options/${id}`)
       this.$data.options = res.data
-      if (this.$store.state.user) {
+      if (this.$store.getters.userLogged) {
         res = await axios.get(`${API}/ankety/votes/${id}`)
         this.$data.myvotes = res.data
       }
@@ -50,18 +50,19 @@ export default {
         { text: `anketa: ${this.$data.survey.name}`, active: true }
       ]
     },
-    canVote: () => {
-      return true
+    canVote: function () {
+      return this.$store.getters.userLogged
     }
   },
   template: `
   <div v-if="!loading">
     <b-breadcrumb :items="items"></b-breadcrumb>
     <div class="row">
-      <div class="col-sm-12 col-md-4">
+      <div class="col-sm-12">
         <h2>{{survey.name}}</h2>
 
-        <img v-if="survey.photo" :src="survey.photo | cdn" class="card-img-top" alt="ilustrační foto">
+        <img v-if="survey.photo" :src="survey.photo | cdn"
+          alt="ilustrační foto ankety">
 
         <h4>{{survey.desc}}</h4>
 
@@ -70,22 +71,30 @@ export default {
           {{survey.voting_start | formatDate}} -
           {{survey.voting_end | formatDate}}.
         </p>
+
+        <div v-if="! $store.getters.userLogged" class="alert alert-danger">
+          <i class="fas fa-exclamation-circle"></i> Pro hlasování je nutné se přihlásit!
+        </div>
       </div>
 
-      <div class="col-sm-12 col-md-8">
+      <div class="col-sm-12">
         <table class="table">
           <tbody>
             <tr v-for="i in options">
-              <td>
-                <a v-if="i.link" v-bind:href="i.link" target="_blank">{{ i.title }}</a>
-                <span v-else>{{ i.title }}</span>
-                <img v-if="i.photo" :src="i.photo | cdn" alt="ilustrační foto">
-                <p>
-                  <votebutton v-if="canVote" :survey="survey" :optionid="i.id" :votes="myvotes">
-                  </votebutton>
-                </p>
+              <td v-if="i.image">
+                <img :src="i.image" style="width: 10em;" alt="ilustrační foto">
               </td>
-              <td>{{ i.desc }}</td>
+              <td>
+                <h3>
+                  <a v-if="i.link" v-bind:href="i.link" target="_blank">
+                    {{ i.title }}
+                  </a>
+                  <span v-else>{{ i.title }}</span>
+                </h3>
+                <votebutton v-if="canVote" :survey="survey" :optionid="i.id" :votes="myvotes">
+                </votebutton>
+                <p v-if="i.desc">{{ i.desc }}</p>
+              </td>
             </tr>
           </tbody>
         </table>

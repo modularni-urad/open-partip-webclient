@@ -41,17 +41,17 @@ export default {
   },
   props: ['survey', 'optionid', 'votes'],
   template: `
-  <b-button v-if="existing" class="btn btn-danger" @click='remove'>
-    odstranit volbu
+  <b-button v-if="existing" class="btn btn-warning" @click='remove'>
+    odstranit volbu <i class="fas fa-times-circle"></i>
   </b-button>
   <div v-else class="btn-group" role="group">
     <b-button class="btn btn-success" @click='sayYes'
       :disabled="positiveDisabled">
-        PRO
+        PRO <i class="fas fa-thumbs-up"></i>
     </b-button>
     <b-button class="btn btn-danger" @click='sayNo'
       :disabled="negativeDisabled">
-        PROTI
+        PROTI <i class="fas fa-thumbs-down"></i>
     </b-button>
   </div>
   `

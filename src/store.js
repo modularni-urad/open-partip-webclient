@@ -8,11 +8,16 @@ export default function (router) {
     state: {
       user: savedUser && JSON.parse(savedUser)
     },
+    getters: {
+      userLogged: state => {
+        return state.user !== null
+      }
+    },
     mutations: {
       logout: async state => {
+        localStorage.removeItem(KEY)
         await axios.post(`${API}/auth/logout`)
         state.user = null
-        localStorage.removeItem(KEY)
         router.push('/')
       },
       login: (state, profile) => {
