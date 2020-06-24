@@ -90,9 +90,10 @@ export default {
                     {{ i.title }}
                   </a>
                   <span v-else>{{ i.title }}</span>
+                  &nbsp;
+                  <votebutton v-if="canVote" :survey="survey" :optionid="i.id" :votes="myvotes">
+                  </votebutton>
                 </h3>
-                <votebutton v-if="canVote" :survey="survey" :optionid="i.id" :votes="myvotes">
-                </votebutton>
                 <p v-if="i.desc">{{ i.desc }}</p>
               </td>
             </tr>
