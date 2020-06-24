@@ -94,7 +94,11 @@ export default {
                   <votebutton v-if="canVote" :survey="survey" :optionid="i.id" :votes="myvotes">
                   </votebutton>
                 </h3>
-                <p v-if="i.desc">{{ i.desc }}</p>
+                <p v-if="i.desc">{{ i.desc }}
+                  <a v-if="i.link" v-bind:href="i.link" target="_blank">
+                    ... více zde ...
+                  </a>
+                </p>
               </td>
             </tr>
           </tbody>
