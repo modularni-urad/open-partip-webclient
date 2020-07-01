@@ -1,4 +1,4 @@
-/* global axios, API, marked, moment */
+/* global axios, API, marked, moment, _ */
 import VoteButton from './parts/votebutton.js'
 import OptionResult from './parts/optionresult.js'
 
@@ -64,6 +64,13 @@ export default {
     },
     inVotingWindow: function () {
       return inVotingWindow(this.$data.survey)
+    },
+    finalResults: function () {
+      return this.$data.results ? _.sortBy(this.$data.options, i => {
+        const pos = Number(this.$data.results.pos[i.id] || 0)
+        const neg = Number(this.$data.results.neg[i.id] || 0)
+        return (pos - neg) * -1 // to revert order
+      }) : []
     }
   },
   template: `
@@ -118,7 +125,7 @@ export default {
         <div v-else>
           <h2>Výsledky</h2>
           <ul>
-            <li v-for="i in options">
+            <li v-for="i in finalResults">
               <optionresult :option="i" :results="results"/>
             </li>
           </ul>
