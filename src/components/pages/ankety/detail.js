@@ -1,5 +1,6 @@
-/* global axios, API, marked */
+/* global axios, API, marked, moment */
 import VoteButton from './parts/votebutton.js'
+import OptionResult from './parts/optionresult.js'
 
 export default {
   data: () => {
@@ -7,11 +8,13 @@ export default {
       loading: true,
       survey: null,
       options: null,
-      myvotes: null
+      myvotes: null,
+      results: null
     }
   },
   components: {
-    votebutton: VoteButton
+    votebutton: VoteButton,
+    optionresult: OptionResult
   },
   metaInfo: function () {
     return this.$data.survey ? {
@@ -34,8 +37,14 @@ export default {
       res = await axios.get(`${API}/ankety/options/${id}`)
       this.$data.options = res.data
       if (this.$store.getters.userLogged) {
-        res = await axios.get(`${API}/ankety/votes/${id}`)
-        this.$data.myvotes = res.data
+        axios.get(`${API}/ankety/votes/${id}`).then(res => {
+          this.$data.myvotes = res.data
+        }).catch(() => {})
+      }
+      if (!inVotingWindow(this.$data.survey)) {
+        axios.get(`${API}/ankety/votes/results/${id}`).then(res => {
+          this.$data.results = res.data
+        }).catch(() => {})
       }
       this.$data.loading = false
     }
@@ -51,7 +60,10 @@ export default {
       ]
     },
     canVote: function () {
-      return this.$store.getters.userLogged
+      return this.$store.getters.userLogged && inVotingWindow(this.$data.survey)
+    },
+    inVotingWindow: function () {
+      return inVotingWindow(this.$data.survey)
     }
   },
   template: `
@@ -78,7 +90,7 @@ export default {
       </div>
 
       <div class="col-sm-12">
-        <table class="table">
+        <table v-if="inVotingWindow" class="table">
           <tbody>
             <tr v-for="i in options">
               <td v-if="i.image">
@@ -103,8 +115,21 @@ export default {
             </tr>
           </tbody>
         </table>
+        <div v-else>
+          <h2>Výsledky</h2>
+          <ul>
+            <li v-for="i in options">
+              <optionresult :option="i" :results="results"/>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
   `
+}
+
+function inVotingWindow (survey) {
+  const now = moment()
+  return now >= moment(survey.voting_start) && now < moment(survey.voting_end)
 }
