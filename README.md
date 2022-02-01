@@ -1,5 +1,7 @@
 # OpenPartip webclient
 
+# NOTE: tohle uz ma cenu mozna jen kvuli [auth](src/components/pages/auth)
+
 ## how to build
 
 ```
